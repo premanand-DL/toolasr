@@ -1,0 +1,15 @@
+#!/bin/bash
+
+enhancement_only=true #If true, only the stage upto enhacement is performed on the multi-channel audio.
+dereverb=              #Optional {wpe,nmf}
+denoise=               #Optional {wiener, spec_sub}
+localize=gcc_phat      #If not specified 'gcc_phat' is default. Values: {gcc_phat, gcc_scot}_
+beamform=mvdr_nn      #If not specified 'mvdr_nn' is default. Values: {dsb, mvdr_ta, mvdr_nn, gev_ta, gev_nn, beamformit}
+diarize=xvector        ##If not specified 'xtdoa' is default. Values: {xvector, tdoa, xtdoa}
+model_dir=exp/chain_cleaned/tdnn_1d_sp                #If not specified 'exp/chain_cleaned/tdnn_1d_sp'(Librispeech acoustic model) is the default model.
+graph_dir=exp/chain_cleaned/tdnn_1d_sp/graph          #If not specified 'exp/chain_cleaned/tdnn_1d_sp/graph'(Librispeech graph directory) is default.
+                                                      
+#If you want to run decoding on TCS data then  using exp/nnet3_chain/tdnn_1d_sp as acoustic model dir and #If you want to run decoding on TCS data then use 'exp/nnet3_chain/tdnn_1d_sp' as acosutic model dir and 'exp/nnet3_chain/tdnn_1d_sp/graph' as the graph dir
+
+ 
+

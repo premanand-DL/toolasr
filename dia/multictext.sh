@@ -10,12 +10,12 @@ if [ $# -ne 2 ]; then
   echo "e.g.:   multictext \\"
   echo "    S10audio decoded_output/"
   echo "main options (for others, see top of script file)"
-  echo "  --config <config-file>                # config containing options"
   echo "  --dereverb <string>                   # Run Single-channel deverberation on multi-channel audio {wpe, nmf }"
   echo "  --denoise <string>                    # Run Single-channel denoising on multi-channel audio {wiener, spec-sub}"
   echo "  --localize <string>                   # Type of TDOA estimation for beamforming. {gcc_phat, gcc_scot}"
-  echo "  --beamform <string>                   # Beaforming method {bermformit, dsb, mvdr_ta, mvdr_nn, gev_ta, gev_nn"
+  echo "  --beamform <string>                   # Beaforming method {beamformit, dsb, mvdr_ta, mvdr_nn, gev_ta, gev_nn"
   echo "  --diarize <string>                    # Type of diarization method {tdoa, xvector,xtdoa}"
+  echo " You can also specify the arguments in config file"
   exit 1;
 fi
 
@@ -33,6 +33,8 @@ beamform) beamform=${OPTARG};;
 diarize) diarize=${OPTARG};;
 esac
 done
+
+. ./config
 
 num_c=$(ls ${input_file}* | wc -l)
 cp ${input_file}* single_channel/
@@ -91,6 +93,9 @@ fi
 #Beamforming
 
 mask=$(echo $beamform | cut -d '_' -f 2)
+if [ ! -z "$mask" ]; then
+beamform=$(echo $beamform | cut -d '_' -f 1)
+fi
 if [ -z "$dereverb" ]; then 
 dereverb=n
 fi
@@ -103,11 +108,13 @@ if [ ! -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then
 octave -q codes/enhancement.m $input_file $localize $beamform $noise $reverb $denoise $dereverb ${num_c} $mask
 
 #diarization and ASR
-else
+fi
+
+[ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
 
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
-./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir 
-fi
+./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only
+
 
 
 
