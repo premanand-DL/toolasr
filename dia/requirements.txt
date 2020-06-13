@@ -1,0 +1,6 @@
+nara-wpe
+SoundFile
+subprocess.run
+tqdm
+numpy
+scipy
