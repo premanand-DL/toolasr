@@ -1,15 +1,17 @@
 #!/bin/bash
-
-diarization_type=$1
+# This script is used to go diarization and then ASR for the input single channel audio
+diarize=$1
 audio_path=$2
 input_file=$3
 output_dir=$4
+enhancement_only=$5
+num_spk=$6
 . ./conf/sad.conf
 . ./path.sh
 . ./cmd.sh
 nj=1
 test_sets=dev_test
-stage=9
+stage=0
 sad_stage=0
 use_new_rttm_reference=false
 score=false
@@ -94,12 +96,14 @@ if [ $stage -le 3 ]; then
  done
 fi
 
-
+exit 
 
 #######################################################################
 # Perform diarization on the dev/eval data
 #######################################################################
+mkdir -p $output_dir
 if [ $stage -le 4 ]; then
+if [ "$diarize" == "xvector" ]; then
   for datadir in ${test_sets}; do
     if $use_new_rttm_reference == "true"; then
       mode="$(cut -d'_' -f1 <<<"$datadir")"
@@ -114,13 +118,12 @@ if [ $stage -le 4 ]; then
       exp/${datadir}_${nnet_type}_seg_diarization
   done
 fi
-#extract TDOA vectors
-cat data/${test_sets}_seg/segments | while read lines
-do
-start=$(echo $lines | cut -d ' ' -f 3)
-end=$(echo $lines | cut -d ' ' -f 4)
-start_line=$(echo $start/250*1000 | bc -l) 
-end_line=$(echo $end/250*1000 | bc -l) 
+
+if [ "$diarize" == "tdoa" ]; then
+python run_vec.py $input_file ${test_sets}_seg $num_spk $output_dir
+fi
+fi
+
 #######################################################################
 # Perform ASR using diarization time stamps
 #######################################################################
@@ -163,20 +166,36 @@ fi
 #######################################################################
 # Writing Conversation text
 #######################################################################
-mkdir -p $output_dir
 cat $dir/decode_${test_dir}_tgsmall/log/decode* | grep -v "LOG" | grep $input_file > $output_dir/${input_file}_segment
-cp exp/${test_sets}_${nnet_type}_seg_diarization/rttm $output_dir/${input_file}_rttm
-sed -i 's/    / /g' $output_dir/${input_file}_rttm
-sed -i 's/   / /g' $output_dir/${input_file}_rttm
-sed -i 's/  / /g' $output_dir/${input_file}_rttm
+if [ "$diarize" == "xvector" ]; then
+	cp exp/${test_sets}_${nnet_type}_seg_diarization/rttm $output_dir/${input_file}_rttm
+	sed -i 's/    / /g' $output_dir/${input_file}_rttm
+	sed -i 's/   / /g' $output_dir/${input_file}_rttm
+	sed -i 's/  / /g' $output_dir/${input_file}_rttm
+	cat data/${test_sets}_${nnet_type}_seg/segments | while read lines
+	do
+	start=$(echo $lines | cut -d ' ' -f 3)
+	spk=$(cat $output_dir/${input_file}_rttm | cut -d ' ' -f 4,8 | grep $start | cut -d ' ' -f 2)
+	seg=$(echo $lines | cut -d ' ' -f 1)
+	text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-)
+	if [ ! -z "$spk" ]; then
+	#echo "Speaker "$spk": "$text #>> ${output_dir}/${input_file}_text
+	echo "Speaker "$spk": "$text >> ${output_dir}/${input_file}_txt
+	fi
+	done
+fi
+
+if [ "$diarize" == "tdoa" ]; then
+start=1
 cat data/${test_sets}_${nnet_type}_seg/segments | while read lines
 do
-start=$(echo $lines | cut -d ' ' -f 3)
-spk=$(cat $output_dir/${input_file}_rttm | cut -d ' ' -f 4,8 | grep $start | cut -d ' ' -f 2)
-seg=$(echo $lines | cut -d ' ' -f 1)
-text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-)
-if [ ! -z "$spk" ]; then
-echo "Speaker "$spk": "$text #>> ${output_dir}/${input_file}_text
-echo "Speaker "$spk": "$text >> ${output_dir}/${input_file}_text
-fi
+	seg=$(echo $lines | cut -d ' ' -f 1)
+	text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-)
+	echo "Speaker "$(sed "${i}q;d" $output_dir/${input_file}_spk_rttm)": "$text
+	echo "Speaker "$(sed "${i}q;d" $output_dir/${input_file}_spk_rttm)": "$text >> ${output_dir}/${input_file}_txt
+	start=$(($start+1))
 done
+fi
+cat ${output_dir}/${input_file}_txt
+echo "RTTM"
+cat ${output_dir}/${input_file}_rttm
