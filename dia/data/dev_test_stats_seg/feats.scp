@@ -1,0 +1,7 @@
+S07_tcs_beamformit-0000000-0000441 /home/samit/kaldi/egs/chime6/dia/mfcc/raw_mfcc_dev_test.1.ark:19[0:440]
+S07_tcs_beamformit-0000441-0001439 /home/samit/kaldi/egs/chime6/dia/mfcc/raw_mfcc_dev_test.1.ark:19[441:1439]
+S07_tcs_beamformit-0001439-0002439 /home/samit/kaldi/egs/chime6/dia/mfcc/raw_mfcc_dev_test.1.ark:19[1440:2438]
+S07_tcs_beamformit-0002439-0003308 /home/samit/kaldi/egs/chime6/dia/mfcc/raw_mfcc_dev_test.1.ark:19[2439:3308]
+S07_tcs_beamformit-0003308-0004101 /home/samit/kaldi/egs/chime6/dia/mfcc/raw_mfcc_dev_test.1.ark:19[3309:4100]
+S07_tcs_beamformit-0004101-0005100 /home/samit/kaldi/egs/chime6/dia/mfcc/raw_mfcc_dev_test.1.ark:19[4101:5099]
+S07_tcs_beamformit-0005100-0005700 /home/samit/kaldi/egs/chime6/dia/mfcc/raw_mfcc_dev_test.1.ark:19[5100:5697]

@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST.in
+README.rst
+setup.cfg
+setup.py
+subprocess.run.pth
+run/__init__.py
+subprocess.run.egg-info/PKG-INFO
+subprocess.run.egg-info/SOURCES.txt
+subprocess.run.egg-info/dependency_links.txt
+subprocess.run.egg-info/not-zip-safe
+subprocess.run.egg-info/top_level.txt
