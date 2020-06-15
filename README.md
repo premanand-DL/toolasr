@@ -1,5 +1,5 @@
-# This tool is used to generate speaker labelled transcripts using a input multi-channel audio. The script ./multictext.sh 
-is to be called from terminal terminal. This tool is as per the system blocks shown in the Figure below
+## Multi-channel audio transription tool
+This tool is used to generate speaker labelled transcripts using a input multi-channel audio. The script ./multictext.sh is to be called from terminal terminal. This tool is as per the system blocks shown in the Figure below
 
 ![System Piupeline](https://github.com/iitbdaplab/toolasr/blob/master/back-end_framework.png)
 
