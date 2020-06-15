@@ -28,6 +28,5 @@ The options to be used along with this file is given in the table below:
 
 The options can also be passed as arguments to the file as an example below :
 ```
-```
 ./multictext.sh /home/user/multi_audio/s01_audio 3  --beamform mvdr output/ 
 ```
