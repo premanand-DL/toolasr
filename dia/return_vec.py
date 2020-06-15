@@ -44,12 +44,24 @@ summ=0
 for i in range(len(dic_list)):
 	summ = summ + np.array(dic_list[i][1])
 cent=summ/len(dic_list)
-j=0
-a[:,j] = cent + 0.1*(cent-np.array(dic_list[j][1]))
-a[:,j+1] = cent + 0.1*(cent-np.array(dic_list[j+1][1]))
+tdoa_list=[]
+tdoa_list.append(dic_list[0][1])
+a[:,0] = cent + 0.1*(cent-np.array(dic_list[0][1]))
+num=1
+#Initializing clusters
+for i in range(len(dic_list)):
+	for j in range(len(tdoa_list)):
+		if dic_list[i+1][1]!=tdoa_list[j]:
+			a[:,num] = cent + 0.1*(cent-np.array(dic_list[i+1][1]))
+			tdoa_list.append(dic_list[i+1][1])
+			num=num+1
+			if num==num_spk: break
+	if num==num_spk: break
+	
+
 epi=10		
 while(epi > 0.01):
-	spk_list=[]
+	spks=[]
 	for i in range(len(dic_list)):
 		temp=100
 		for j in range(num_spk):
@@ -57,13 +69,12 @@ while(epi > 0.01):
 			if temp > dist:
 				temp=dist
 				spk=j
-		spk_list.append(spk)
+		spks.append(spk)
 	val=0
-	print(spk_list)
 	for j in range(num_spk):
 		sums=0;num=0;
-		for i in range(len(spk_list)):
-			if j == spk_list[i]:
+		for i in range(len(spks)):
+			if j == spks[i]:
 				sums=np.array(dic_list[i][1])+sums
 				num=num+1
 		if num!=0: 
@@ -75,7 +86,7 @@ while(epi > 0.01):
 	else: break
 
 
-num_spk=2
+
 spk_list=[]
 spk_list.append(dic_list[0][1])
 spk=[]
@@ -92,19 +103,17 @@ for i in range(1,len(dic_list)):
 		num=num+1
 		spk.append(num)
 		spk_list.append(dic_list[i][1])
+#Writing the labels file
 with open(sys.argv[4]+'/'+sys.argv[1]+'_spk_rttm','w') as f:		
+	for line in range(len(dic_list)):
+		f.write(spks[line]+'\n')
+with open(sys.argv[4]+'/'+sys.argv[1]+'_spk_rttm1','w') as f:		
 	for line in range(len(dic_list)):
 		f.write(spk[line]+'\n')
 		
-	
-# Python program to print 
-# mode of elements 
-
-				
 			
 
 
 	
 	
-
 
