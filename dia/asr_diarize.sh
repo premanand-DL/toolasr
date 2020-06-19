@@ -112,7 +112,7 @@ echo '------Running x-vector feature diarization-------------'
       --ref-rttm $ref_rttm \
       exp/xvector_nnet_1a \
       data/${datadir}_${nnet_type}_seg \
-      exp/${datadir}_${nnet_type}_seg_diarization
+      exp/${datadir}_${nnet_type}_seg_diarization $num_spk
   done
 fi
 
