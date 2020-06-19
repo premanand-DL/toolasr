@@ -210,3 +210,32 @@ def gev_wrapper_on_masks(mix, noise_mask=None, target_mask=None,
     output = output.astype(org_dtype)
 
     return output.T
+
+def mvdr_wrapper_on_masks(mix, noise_mask=None, target_mask=None):
+
+    if noise_mask is None and target_mask is None:
+        raise ValueError('At least one mask needs to be present.')
+
+    mix = mix.T
+    if noise_mask is not None:
+        noise_mask = noise_mask.T
+    if target_mask is not None:
+        target_mask = target_mask.T
+
+    if target_mask is None:
+        target_mask = np.clip(1 - noise_mask, 1e-6, 1)
+    if noise_mask is None:
+        noise_mask = np.clip(1 - target_mask, 1e-6, 1)
+
+    # target_psd_matrix: (bins, sensors, sensors)
+    # mix: (bins, sensors, frames)
+    # target_mask: (bins, frames)
+    target_psd_matrix = get_power_spectral_density_matrix(mix, target_mask)
+    noise_psd_matrix = get_power_spectral_density_matrix(mix, noise_mask)
+
+    # Beamforming vector
+    steer_vector = get_steer_vector(target_psd_matrix)
+    w_mvdr = get_mvdr_vector(steer_vector, noise_psd_matrix)
+
+    output = apply_beamforming_vector(w_mvdr, mix)
+    return output.T
