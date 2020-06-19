@@ -188,11 +188,11 @@ if [ "$diarize" == "xvector" ]; then
 	sed -i 's/   / /g' $output_dir/${input_file}_rttm
 	sed -i 's/  / /g' $output_dir/${input_file}_rttm
 	cat $output_dir/${input_file}_rttm | cut -d ' ' -f 8 > $output_dir/${input_file}_unsorted_rttm
-	python sort_spk.py $output_dir/${input_file}_unsorted_rttm 
+	python sort_spk.py $output_dir/${input_file}_unsorted_rttm $output_dir/${input_file}_labels
 	cat data/${test_sets}_${nnet_type}_seg/segments | while read lines
 	do
 	start=$(echo $lines | cut -d ' ' -f 3)
-	spk=$(cat $output_dir/${input_file}_rttm | cut -d ' ' -f 4,8 | grep $start | cut -d ' ' -f 2)
+	spk=$(cat $output_dir/${input_file}_labels | cut -d ' ' -f 4,8 | grep $start | cut -d ' ' -f 2)
 	seg=$(echo $lines | cut -d ' ' -f 1)
 	text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-)
 	if [ ! -z "$spk" ]; then
