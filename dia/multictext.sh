@@ -109,7 +109,7 @@ fi
 sam_fre=$(sox --i -r single_channel/${input_file}.CH1.wav)  
 if [ "${sam_fre}" != "16000" ]; then
 	for i in {1..${num_c}};do
-	 sox single_channel/${input_file}.CH${i}.wav -c 1 -r 16000 single_channel/${input_file}.CH{i}.wav
+	 sox single_channel/${input_file}.CH${i}.wav -c 1 -r 16000 single_channel/${input_file}.CH${i}.wav
 	done
 fi
 
