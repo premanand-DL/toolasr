@@ -1,11 +1,14 @@
 #!/bin/bash
 # This script is used to go diarization and then ASR for the input single channel audio
+. ./config
 diarize=$1
 audio_path=$2
 input_file=$3
 output_dir=$4
 enhancement_only=$5
 num_spk=$6
+beamform=$7
+
 . ./conf/sad.conf
 . ./path.sh
 . ./cmd.sh
@@ -16,10 +19,12 @@ sad_stage=0
 use_new_rttm_reference=false
 score=false
 diarizer_stage=0
+
+echo '
 #######################################################################
 # Perform DATA Prepration
 #######################################################################
-
+'
 if [ $stage -le 1 ];then
 mkdir -p data.bak
 cp -r data/* data.bak/
@@ -41,10 +46,11 @@ utils/fix_data_dir.sh $data_set
 
 fi
 
-
+echo '
 #######################################################################
-# Perform feature extraction
+# Perform feature extraction for SAD
 #######################################################################
+'
 if [ $stage -le 2 ]; then
   # mfccdir should be some place with a largish disk where you
   # want to store MFCC features.
@@ -56,10 +62,11 @@ if [ $stage -le 2 ]; then
   done
 fi
 
+echo '
 #######################################################################
-# Perform SAD on the dev/eval data
+# Perform SAD on the recording for obtaining segments
 #######################################################################
-
+'
 dir=exp/segmentation${affix}
 sad_work_dir=exp/sad${affix}_${nnet_type}/
 sad_nnet_dir=$dir/tdnn_${nnet_type}_sad_1a
@@ -76,34 +83,24 @@ if [ $stage -le 3 ]; then
      data/${datadir} || exit 1
 
     test_dir=data/${datadir}_${nnet_type}_seg
-    mv data/${datadir}_seg ${test_dir}/
-   # cp data/${datadir}/{segments,utt2spk} ${test_dir}/              # cp data/${datadir}/{segments.bak,utt2spk.bak} ${test_dir}/
-    # Generate RTTM file from segmentation performed by SAD. This can
-    # be used to evaluate the performance of the SAD as an intermediate
-    # step.
+    mkdir -p  $test_dir
+    mv data/${datadir}_seg/* ${test_dir}/.
     steps/segmentation/convert_utt2spk_and_segments_to_rttm.py \
       ${test_dir}/utt2spk ${test_dir}/segments ${test_dir}/rttm
-  if [ $score == "true" ]; then
-      echo "Scoring $datadir.."
-      # We first generate the reference RTTM from the backed up utt2spk and segments
-      # files.
-      ref_rttm=${test_dir}/ref_rttm
-      steps/segmentation/convert_utt2spk_and_segments_to_rttm.py ${test_dir}/utt2spk.bak \
-        ${test_dir}/segments.bak ${test_dir}/ref_rttm
-
-  fi
 
  done
 fi
 
-exit 
 
+echo '
 #######################################################################
 # Perform diarization on the dev/eval data
 #######################################################################
+'
 mkdir -p $output_dir
 if [ $stage -le 4 ]; then
 if [ "$diarize" == "xvector" ]; then
+echo '------Running x-vector feature diarization-------------'
   for datadir in ${test_sets}; do
     if $use_new_rttm_reference == "true"; then
       mode="$(cut -d'_' -f1 <<<"$datadir")"
@@ -120,18 +117,36 @@ if [ "$diarize" == "xvector" ]; then
 fi
 
 if [ "$diarize" == "tdoa" ]; then
-python run_vec.py $input_file ${test_sets}_seg $num_spk $output_dir
-fi
+	echo '------Running beamformit TDOA feature diarization-------------'
+	if [ "$beamform" != "beamformit" ];then
+		./run_beamformit.sh beamform $(echo $input_file | cut -d '_' -f 1)
+	python run_vec.py $input_file ${test_sets}_seg $num_spk $output_dir
+	fi
 fi
 
+if [ "$diarize" == "xtdoa" ]; then
+	echo '------Running beamformit TDOA feature diarization-------------'
+	if [ "$beamform" != "beamformit" ];then
+		./run_beamformit.sh beamform $(echo $input_file | cut -d '_' -f 1)
+	python run_vec.py $input_file ${test_sets}_seg $num_spk $output_dir xtdoa
+	fi
+fi
+
+fi
+
+echo '
 #######################################################################
 # Perform ASR using diarization time stamps
 #######################################################################
+'
 test_dir=${test_sets}_${nnet_type}_seg_asr
 mkdir -p data/$test_dir
 cp data/${test_sets}_${nnet_type}_seg/{segments,wav.scp,spk2utt,utt2spk} data/$test_dir/
-dir=exp/chain_cleaned/tdnn_1d_sp
-graph_dir=$dir/graph_tgsmall
+
+#If the ASR decoder graph already exists then specify the paths below by uncommenting, 
+#else the paths from config file will be taken
+#model_dir=exp/chain_cleaned/tdnn_1d_sp
+#graph_dir=$dir/graph_tgsmall
 if [ $stage -le 5 ]; then
 for datadir in ${test_dir}; do
     steps/make_mfcc.sh --nj $nj --mfcc-config conf/mfcc_hires_asr.conf \
@@ -149,24 +164,24 @@ steps/online/nnet2/extract_ivectors_online.sh --cmd "$train_cmd" --nj "${nspk}" 
       exp/nnet3_cleaned/ivectors_${data}
 fi
 
-if [ $stage -le 7 ]; then
-utils/mkgraph.sh --self-loop-scale 1.0 --remove-oov \
-  data/lang_test_tgsmall $dir $graph_dir
-fi
 
 if [ $stage -le 8 ]; then
+[ ! -f "${graph_dir}/HCLG.fst" ] && utils/mkgraph.sh --self-loop-scale 1.0 --remove-oov \
+  data/lang ${model_dir} $graph_dir
+
 decode_set=$test_dir
 steps/nnet3/decode.sh --acwt 1.0 --post-decode-acwt 10.0 \
     --nj ${nj} --cmd "$decode_cmd" \
     --online-ivector-dir exp/nnet3_cleaned/ivectors_${decode_set} \
-    $graph_dir data/${decode_set} $dir/decode_${decode_set}_tgsmall
+    $graph_dir data/${decode_set} ${model_dir}/decode_${decode_set}_tgsmall
 fi
 
-
+echo '
 #######################################################################
 # Writing Conversation text
 #######################################################################
-cat $dir/decode_${test_dir}_tgsmall/log/decode* | grep -v "LOG" | grep $input_file > $output_dir/${input_file}_segment
+'
+cat ${model_dir}/decode_${test_dir}_tgsmall/log/decode* | grep -v "LOG" | grep $input_file > $output_dir/${input_file}_segment
 if [ "$diarize" == "xvector" ]; then
 	cp exp/${test_sets}_${nnet_type}_seg_diarization/rttm $output_dir/${input_file}_rttm
 	sed -i 's/    / /g' $output_dir/${input_file}_rttm
@@ -196,6 +211,4 @@ do
 	start=$(($start+1))
 done
 fi
-cat ${output_dir}/${input_file}_txt
-echo "RTTM"
-cat ${output_dir}/${input_file}_rttm
+cat ${output_dir}/${input_file}_txt.bak
