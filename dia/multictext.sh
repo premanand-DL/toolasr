@@ -1,14 +1,17 @@
 #!/bin/bash
 
 input_file=$1
-output_dir=$2
+num_spk=$2
+output_dir=$3
 
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 [options] <input-filename> <out-dir>"
-  echo "If the file has path /home/user/audio/S01audio.CH1.wav, then just give If the file has path /home/user/audio/S01audio as <input-filename> "
-  echo "e.g.:   multictext \\"
-  echo "    S10audio decoded_output/"
+if [ $# -ne 3 ]; then
+  echo "Usage: $0 [options] <input-filename> <num-of-speakers> <out-dir>"
+  echo "If the file has path /home/user/audio/S01audio.CH1.wav, then just give /home/user/audio/S01audio as <input-filename> "
+  echo "<num-of-speakers> should be in range from 2 to 7"
+  echo "e.g.:   ./multictext.sh /home/sachin/multi_audio/S10audio 3 decoded_output/"
+  echo "<out-dir> should be where the transcripts are stored"
+  echo "Have the audio files in the form named as S10_audio.CH1.wav, S10_audio.CH2.wav, S10_audio.CH3.wav and so on"
   echo "main options (for others, see top of script file)"
   echo "  --dereverb <string>                   # Run Single-channel deverberation on multi-channel audio {wpe, nmf }"
   echo "  --denoise <string>                    # Run Single-channel denoising on multi-channel audio {wiener, spec-sub}"
@@ -20,26 +23,76 @@ if [ $# -ne 2 ]; then
 fi
 
 
+[[ $num_spk != ?(-)+([2-7]) ]] && echo "Either $num_spk is not integer or out of limits for number of speakers" && exit 1
 denoise=
 dereverb=
-while getopts dereverb:denoise:localize:beamform:diarize option
-do
-case "${option}"
-in
-dereverb) dereverb=${OPTARG};;
-denoise) denoise=${OPTARG};;
-localize) localize=${OPTARG};;
-beamform) beamform=${OPTARG};;
-diarize) diarize=${OPTARG};;
-esac
-done
 
 . ./config
+rm -f steps/ utils/
+ln -s ../../wsj/s5/steps .
+ln -s ../../wsj/s5/utils .
+# Read command line options
+ARGUMENT_LIST=(
+    "dereverb"
+    "denoise"
+    "localize"
+    "beamform"
+    "diarize"
+    "enhancement_only"
+)
+
+
+
+# read arguments
+opts=$(getopt \
+    --longoptions "$(printf "%s:," "${ARGUMENT_LIST[@]}")" \
+    --name "$(basename "$0")" \
+    --options "" \
+    -- "$@"
+)
+
+
+eval set --$opts
+
+while true; do
+    case "$1" in
+    --dereverb)  
+        shift
+        dereverb=$1
+        ;;
+    --denoise)  
+        shift
+        denoise=$1
+        ;;
+    --localize)  
+        shift
+        localize=$1
+        ;;
+    --beamform)  
+        shift
+        beamform=$1
+        ;;
+    --diarize)  
+        shift
+        diarize=$1
+        ;;
+    --enhancement_only)  
+        shift
+        enhancement_only=$1
+        ;;
+      --)
+        shift
+        break
+        ;;
+    esac
+    shift
+done
 
 num_c=$(ls ${input_file}* | wc -l)
 cp ${input_file}* single_channel/
-input_file=$(echo $input_file | rev | cut -d '/' -f 1 | rev | awk -F '.CH' '{print $1}')
+input_file=$(echo $input_file | rev | cut -d '/' -f 1 | rev )
 
+#default arguments
 if [ -z "$localize" ]; then
 localize=gcc_phat
 fi
@@ -52,14 +105,24 @@ if [ -z "$diarize" ]; then
 diarize=xvector
 fi
 
+#Get Sampling rate and downsampke to 16KHz
+sam_fre=$(sox --i -r single_channel/${input_file}.CH1.wav)  
+if [ "${sam_fre}" != "16000" ]; then
+	for i in {1..${num_c}};do
+	 sox single_channel/${input_file}.CH${i}.wav -c 1 -r 16000 single_channel/${input_file}.CH{i}.wav
+	done
+fi
+
+
+#Options to run single-channel enhancement before beamforming
 
 reverb=1
 noise=1
-
 if [ -z "$dereverb" ] || [ -z "$denoise" ]; then
 
 if [ -z "$denoise" ] && [ ! -z "$dereverb" ] ; then
 #do dereverb only
+
 reverb=1
 noise=0
 #do wpe
@@ -77,6 +140,7 @@ noise=1
 if [ "$denoise" == "wiener" ]; then
 octave -q codes/denoising/enhance.m $input_file Wiener $num_c
 fi    
+
 #do denoise only
 if [ "$denoise" == "spec-sub" ]; then
 octave -q codes/denoising/enhance.m $input_file Spec-Sub $num_c
@@ -91,10 +155,9 @@ fi
 
 
 #Beamforming
-
 mask=$(echo $beamform | cut -d '_' -f 2)
 if [ ! -z "$mask" ]; then
-beamform=$(echo $beamform | cut -d '_' -f 1)
+beamforming=$(echo $beamform | cut -d '_' -f 1)
 fi
 if [ -z "$dereverb" ]; then 
 dereverb=n
@@ -103,18 +166,15 @@ if [ -z "$denoise" ]; then
 denoise=n
 fi 
 
-if [ ! -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then
-
-octave -q codes/enhancement.m $input_file $localize $beamform $noise $reverb $denoise $dereverb ${num_c} $mask
-
-#diarization and ASR
+if [ ! -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then # If the file exists then proceed to diarization and ASR
+octave -q codes/enhancement.m $input_file $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask
 fi
 
 [ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
 
+#diarization and ASR
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
-./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only
-
+./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
 
 
 
