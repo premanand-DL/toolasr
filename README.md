@@ -3,11 +3,16 @@ This tool is used to generate speaker labelled transcripts using a input multi-c
 
 ![System Piupeline](https://github.com/iitbdaplab/toolasr/blob/master/back-end_framework.png)
 
-First, download the repository,
+
+First move to the kaldi path
+```
+cd <your path where kaldi is installed>/kaldi/egs
+```
+then, download the repository, 
 ```
 $: git clone https://github.com/iitbdaplab/toolasr
 and
-$: cd dia 
+$: cd toolasr/dia 
 ```
 The script can be run using the command below :
 ```
