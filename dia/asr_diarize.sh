@@ -187,6 +187,8 @@ if [ "$diarize" == "xvector" ]; then
 	sed -i 's/    / /g' $output_dir/${input_file}_rttm
 	sed -i 's/   / /g' $output_dir/${input_file}_rttm
 	sed -i 's/  / /g' $output_dir/${input_file}_rttm
+	cat $output_dir/${input_file}_rttm | cut -d ' ' -f 8 > $output_dir/${input_file}_unsorted_rttm
+	python sort_spk.py $output_dir/${input_file}_unsorted_rttm 
 	cat data/${test_sets}_${nnet_type}_seg/segments | while read lines
 	do
 	start=$(echo $lines | cut -d ' ' -f 3)
