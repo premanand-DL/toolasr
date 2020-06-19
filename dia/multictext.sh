@@ -28,7 +28,7 @@ denoise=
 dereverb=
 
 . ./config
-rm -f steps/ utils/
+
 ln -s ../../wsj/s5/steps .
 ln -s ../../wsj/s5/utils .
 # Read command line options
