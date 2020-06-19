@@ -16,7 +16,7 @@ ref_rttm=cat
 echo "$0 $@"  # Print the command line for logging
 if [ -f path.sh ]; then . ./path.sh; fi
 . parse_options.sh || exit 1;
-if [ $# != 3 ]; then
+if [ $# != 4 ]; then
   echo "Usage: $0 <model-dir> <in-data-dir> <out-dir>"
   echo "e.g.: $0 exp/xvector_nnet_1a  data/dev exp/dev_diarization"
   echo "Options: "
@@ -29,6 +29,7 @@ fi
 model_dir=$1
 data_in=$2
 out_dir=$3
+num_spk=$4
 
 name=`basename $data_in`
 
@@ -86,7 +87,7 @@ fi
 cat data/$name/wav.scp | while read lines
 do
 num=$(echo $lines | cut -d '_' -f 1  | cut -d 'S' -f 2)
-cat  ~/MTP2/multi_audio1/meta-data/spk_id_$num | sort -u | wc -l >> rec
+echo $num_spk >> rec
 done
 paste -d ' ' <(cat data/$name/wav.scp | cut -d ' ' -f 1) rec >> rec2
 mv rec2 data/$name/reco2num_spk
