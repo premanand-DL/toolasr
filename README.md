@@ -51,3 +51,8 @@ The details of intermediate stages of output is listed below
 * The output audio of single-channel enhancement method is stored at ```single_<denoise/derevereb>``` folder 
 * The output audio of beamforming is stored at ```out_beamform``` as ```<input-file>_<beamform>.wav```.
 * The output of diarization and ASR is stored at the ```<output>``` folder specified when the script is run.
+
+You can log your output of the script to a file using the command 
+```
+./multictext.sh /home/user/multi_audio/s01_audio 3 output/ | tee log.txt
+```
