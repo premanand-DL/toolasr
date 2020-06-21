@@ -25,7 +25,7 @@ The script can be run using the command below :
 ```
 For eg.
 ```
-./multictext.sh /home/user/multi_audio/s01_audio <num_spk> output/ 
+./multictext.sh /home/user/multi_audio/s01_audio 3 output/ 
 ```
 where the multi-channel audio is stored as s01_audio.{CH1,CH2,CH3,CH4}.wav, <num_spk> are total number of speakers 
 in the session and output is where the transcripts generated will be stored. You can use the sample audios from multi_audio 
