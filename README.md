@@ -21,6 +21,10 @@ source setup.sh
 ```
 The script can be run using the command below :
 ```
+./multictext.sh $PWD/<input-filename> <num_spk> <output-dir>
+```
+For eg.
+```
 ./multictext.sh /home/user/multi_audio/s01_audio <num_spk> output/ 
 ```
 where the multi-channel audio is stored as s01_audio.{CH1,CH2,CH3,CH4}.wav, <num_spk> are total number of speakers 
@@ -40,3 +44,10 @@ The options can also be passed as arguments to the file as an example below :
 ```
 ./multictext.sh /home/user/multi_audio/s01_audio 3  --beamform mvdr output/ 
 ```
+## Other Instructions
+The script used by the tool ```multictext.sh``` has a config file ```config``` which allows to choose the set of parameters 
+like the type of enhancements, diarization method and so on. You can chnage the options here or give the options as in-line arguments using the names in the above table.
+The details of intermediate stages of output is listed below
+⋅⋅* The output audio of single-channel enhancement method is stored at ```single_<denoise/derevereb>``` folder as a 4 channels.
+⋅⋅* The output audio of beamforming is stored at ```out_beamform``` as ```<input-file>_<beamform>.wav```.
+..* The output of diarization and ASR is stored at the ```<output>``` folder specified when the script is run.
