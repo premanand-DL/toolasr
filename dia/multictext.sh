@@ -168,13 +168,22 @@ fi
 
 if [ ! -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then # If the file exists then proceed to diarization and ASR
 octave -q codes/enhancement.m $input_file $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask
+[ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
+#diarization and ASR
+path=$PWD/out_beamform/${input_file}_${beamform}.wav
+./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
+exit 1
 fi
 
 [ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
 
+if [ -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then
+echo Using the enhanced output from ${PWD}/out_beamform/${input_file}_${beamform}.wav
 #diarization and ASR
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
+fi
+
 
 
 
