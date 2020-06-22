@@ -44,14 +44,7 @@ The options can also be passed as arguments to the file as an example below :
 ```
 ./multictext.sh /home/user/multi_audio/s01_audio 3  --beamform mvdr output/ 
 ```
-## Other Instructions
-The script used by the tool ```multictext.sh``` has a config file ```config``` which allows to choose the set of parameters 
-like the type of enhancements, diarization method and so on. You can chnage the options here or give the options as in-line arguments using the names in the above table.
-The details of intermediate stages of output is listed below
-* The output audio of single-channel enhancement method is stored at ```single_<denoise/derevereb>``` folder 
-* The output audio of beamforming is stored at ```out_beamform``` as ```<input-file>_<beamform>.wav```.
-* The output of diarization and ASR is stored at the ```<output>``` folder specified when the script is run.
-
+You can also use single channel audio to decode by setting the parameter ```single_channel_decode=false``` in the config file.
 After the succesful run of the tool, the output conversation stored will be in the format:
 ```
 SPEAKER 1 : listen is anything going to happen here so what are we suppose to be doing here 
@@ -62,6 +55,15 @@ SPEAKER 3 : i am speaker three i am the incorporator of this city
 SPEAKER 1 : right now we have a problem the name of this place is you university new newtork academy on wednesday i went to the university of state of taxes and was told that we could not incorporate with the name college or university without beginning existence for two years
 SPEAKER 3 : the problem is that what we should we do what we can to incorporate outside of taxes
 ```
+## Other Instructions
+The script used by the tool ```multictext.sh``` has a config file ```config``` which allows to choose the set of parameters 
+like the type of enhancements, diarization method and so on. You can chnage the options here or give the options as in-line arguments using the names in the above table.
+The details of intermediate stages of output is listed below
+* The output audio of single-channel enhancement method is stored at ```single_<denoise/derevereb>``` folder 
+* The output audio of beamforming is stored at ```out_beamform``` as ```<input-file>_<beamform>.wav```.
+* The output of diarization and ASR is stored at the ```<output>``` folder specified when the script is run.
+
+
 You can log your output of the script to a file using the command 
 ```
 ./multictext.sh /home/user/multi_audio/s01_audio 3 output/ | tee log.txt
