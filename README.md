@@ -36,7 +36,7 @@ where the multi-channel audio is stored as s01_audio.{CH1,CH2,CH3,CH4}.wav, <num
 in the session and output is where the transcripts generated will be stored. You can use the sample audios from multi_audio 
 folder in the directory cloned. 
 
-The options to be used along with this file is given in the table below:
+The options in the config file are given in the table below:
 |   Option  |                                                              Description                                                              |                 Values                |
 |:---------:|:-------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------:|
 | -denoise  | Does signal-channel denoising on the multi-channel audio                                                                              |            wiener, spec-sub           |
