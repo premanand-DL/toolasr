@@ -52,7 +52,18 @@ The details of intermediate stages of output is listed below
 * The output audio of beamforming is stored at ```out_beamform``` as ```<input-file>_<beamform>.wav```.
 * The output of diarization and ASR is stored at the ```<output>``` folder specified when the script is run.
 
+After the succesful run of the tool, the output conversation stored will be in the format:
+```
+SPEAKER 1 : listen is anything going to happen here so what are we suppose to be doing here 
+SPEAKER 2 : robin has lords into mighty he should short here shortly we can directly start without the director person
+SPEAKER 3 : speaker three maybe you say a few words for introduction things which reader of aint i dot you you dot future already know 
+SPEAKER 2 : this meeting is called to order second that
+SPEAKER 3 : i am speaker three i am the incorporator of this city 
+SPEAKER 1 : right now we have a problem the name of this place is you university new newtork academy on wednesday i went to the university of state of taxes and was told that we could not incorporate with the name college or university without beginning existence for two years
+SPEAKER 3 : the problem is that what we should we do what we can to incorporate outside of taxes
+```
 You can log your output of the script to a file using the command 
 ```
 ./multictext.sh /home/user/multi_audio/s01_audio 3 output/ | tee log.txt
 ```
+
