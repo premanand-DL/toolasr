@@ -16,7 +16,7 @@ $: cd toolasr/dia
 ```
 After finally following  the setup instructions, please download the model with the drive link given below and paste the extracted ```exp/``` in the ```dia``` folder.  
 ```
-https://drive.google.com/drive/folders/17utymefPCrHk49HeMKwziXSW5nVfwPtC?usp=sharing
+https://drive.google.com/drive/folders/1oSYHCkm6hz4PZwVvruCS3xgT5fON2gMM?usp=sharing
 ```
 
 Then initialize python virtual environment for python dependencies
