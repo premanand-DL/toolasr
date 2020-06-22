@@ -18,6 +18,7 @@ After finally following  the setup instructions, please download the model with
 ```
 https://drive.google.com/drive/folders/1oSYHCkm6hz4PZwVvruCS3xgT5fON2gMM?usp=sharing
 ```
+Here the ASR model stored is LibreSpeech model. To train on our own model, please specify the model path in ```config``` file.
 
 Then initialize python virtual environment for python dependencies
 ```
@@ -43,6 +44,8 @@ The options to be used along with this file is given in the table below:
 | -localize | GCC based localization to compute the time difference of  arrival (TDOA) used as steering vector for beamforming                      |           gcc_phat, gcc_scot          |
 | -beamform | Does multi-channel enhancement. Does it on the enhanc- ed audio using  single-channel denoising and/or dreverb- eration, if specified | dsb, mvdr_ta, mvdr_nn, gev_ta, gev_nn |
 | -diarize  | The type of diarization system used                                                                                                   |          xvector, tdoa, xtdoa         |
+| -model_dir | Please give the relative model path     |   eg exp/chain_cleaned/tdnn_sp_1a   |
+| -graph_dir | Please give the relative graph directory path     |   eg exp/chain_cleaned/tdnn_sp_1a/graph   |
 
 The options can also be passed as arguments to the file as an example below :
 ```
