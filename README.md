@@ -47,7 +47,7 @@ The options can also be passed as arguments to the file as an example below :
 You can also use single channel audio to decode by setting the parameter ```single_channel_decode=false``` in the config file 
 by calling the command
 ```
-./multictext.sh /home/user/multi_audio/s01_audio.CH1.wav 3  --beamform mvdr output/ 
+./multictext.sh /home/user/multi_audio/s01_audio.CH1.wav 3 output/ 
 ```
 After the succesful run of the tool, the output conversation stored will be in the format:
 ```
