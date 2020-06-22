@@ -1,5 +1,6 @@
 #!/bin/bash
 # This script is used to go diarization and then ASR for the input single channel audio
+
 . ./config
 diarize=$1
 audio_path=$2
@@ -8,6 +9,7 @@ output_dir=$4
 enhancement_only=$5
 num_spk=$6
 beamform=$7
+
 
 . ./conf/sad.conf
 . ./path.sh
@@ -32,6 +34,9 @@ rm -rf data
 
 data_set=data/dev_test
 mkdir -p $data_set
+if [ "$single_channel_decode" == "true" ]; then 
+input_file=$(echo $audio_path | rev | cut -d '/' -f 1 | rev | awk -F '.wav' '{print $1}')
+done
 echo $audio_path | rev | cut -d '/' -f 1 | rev | awk -F '.wav' '{print $1}' > $data_set/wav.scp
 cat $data_set/wav.scp | while read lines
 do
@@ -116,7 +121,7 @@ echo '------Running x-vector feature diarization-------------'
   done
 fi
 
-if [ "$diarize" == "tdoa" ]; then
+if [ "$diarize" == "tdoa" ] && [ "$single_channel_decode" == "false" ]; then
 	echo '------Running beamformit TDOA feature diarization-------------'
 	if [ "$beamform" != "beamformit" ];then
 		./run_beamformit.sh beamform $(echo $input_file | cut -d '_' -f 1)
@@ -124,7 +129,7 @@ if [ "$diarize" == "tdoa" ]; then
 	fi
 fi
 
-if [ "$diarize" == "xtdoa" ]; then
+if [ "$diarize" == "xtdoa" ] && [ "$single_channel_decode" == "false" ]; then
 	echo '------Running beamformit TDOA feature diarization-------------'
 	if [ "$beamform" != "beamformit" ];then
 		./run_beamformit.sh beamform $(echo $input_file | cut -d '_' -f 1)
@@ -187,19 +192,17 @@ if [ "$diarize" == "xvector" ]; then
 	sed -i 's/    / /g' $output_dir/${input_file}_rttm
 	sed -i 's/   / /g' $output_dir/${input_file}_rttm
 	sed -i 's/  / /g' $output_dir/${input_file}_rttm
-	cat $output_dir/${input_file}_rttm | cut -d ' ' -f 8 > $output_dir/${input_file}_unsorted_rttm
-	python sort_spk.py $output_dir/${input_file}_unsorted_rttm $output_dir/${input_file}_labels
 	cat data/${test_sets}_${nnet_type}_seg/segments | while read lines
 	do
 	start=$(echo $lines | cut -d ' ' -f 3)
-	spk=$(cat $output_dir/${input_file}_labels | cut -d ' ' -f 4,8 | grep $start | cut -d ' ' -f 2)
+	spk=$(cat $output_dir/${input_file}_rttm | cut -d ' ' -f 4,8 | grep $start | cut -d ' ' -f 2)
+	[ ! -z "$spk" ] && echo 'SPEAKER '${spk}' : ' >> $output_dir/${input_file}_unsorted_rttm
 	seg=$(echo $lines | cut -d ' ' -f 1)
-	text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-)
-	if [ ! -z "$spk" ]; then
-	#echo "Speaker "$spk": "$text #>> ${output_dir}/${input_file}_text
-	echo "Speaker "$spk": "$text >> ${output_dir}/${input_file}_txt
-	fi
+	text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-) >> $output_dir/${input_file}_txt_temp
 	done
+	python sort_spk.py $output_dir/${input_file}_unsorted_rttm $output_dir/${input_file}_labels
+	paste -d ' ' $output_dir/${input_file}_labels $output_dir/${input_file}_txt_temp > ${output_dir}/${input_file}_txt
+	#echo "Speaker "$spk": "$text >> ${output_dir}/${input_file}_txt
 fi
 
 if [ "$diarize" == "tdoa" ]; then
@@ -213,4 +216,5 @@ do
 	start=$(($start+1))
 done
 fi
-cat ${output_dir}/${input_file}_txt.bak
+
+cat  ${output_dir}/${input_file}_txt
