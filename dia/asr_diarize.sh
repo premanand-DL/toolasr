@@ -194,7 +194,7 @@ if [ "$diarize" == "xvector" ]; then
 	do
 	start=$(echo $lines | cut -d ' ' -f 3)
 	spk=$(cat $output_dir/${input_file}_rttm | cut -d ' ' -f 4,8 | grep $start | cut -d ' ' -f 2)
-	[ ! -z "$spk" ] && echo 'SPEAKER '${spk}' : ' >> $output_dir/${input_file}_unsorted_rttm
+	[ ! -z "$spk" ] && echo ${spk} >> $output_dir/${input_file}_unsorted_rttm
 	seg=$(echo $lines | cut -d ' ' -f 1)
 	text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-) >> $output_dir/${input_file}_txt_temp
 	done
