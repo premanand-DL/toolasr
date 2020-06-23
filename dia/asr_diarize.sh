@@ -35,7 +35,6 @@ rm -rf data
 data_set=data/dev_test
 mkdir -p $data_set
 [ "$single_channel_decode" == "true" ] && input_file=$(echo $audio_path | rev | cut -d '/' -f 1 | rev | awk -F '.wav' '{print $1}')
-
 echo $audio_path | rev | cut -d '/' -f 1 | rev | awk -F '.wav' '{print $1}' > $data_set/wav.scp
 cat $data_set/wav.scp | while read lines
 do
