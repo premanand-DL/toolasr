@@ -4,7 +4,7 @@ with open(sys.argv[1],'r') as f:
 	lines=f.readlines()
 
 spk_list=[]
-spk_list.append(int(lines[0].strip()))
+spk_list.append(int(lines[0].strip().split(' ')[1]))
 spk=[]
 spk.append(1)
 num=1
