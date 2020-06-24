@@ -22,6 +22,7 @@ use_new_rttm_reference=false
 score=false
 diarizer_stage=0
 
+
 echo '
 #######################################################################
 # Perform DATA Prepration
@@ -100,8 +101,11 @@ echo '
 # Perform diarization on the dev/eval data
 #######################################################################
 '
+
 mkdir -p $output_dir
 if [ $stage -le 4 ]; then
+echo 'Removing all earlier stored label and transcript files before starting diarization'
+rm -f $output_dir/${input_file}_*rttm* $output_dir/${input_file}_*txt_temp* $output_dir/${input_file}_*labels*
 if [ "$diarize" == "xvector" ]; then
 echo '------Running x-vector feature diarization-------------'
   for datadir in ${test_sets}; do
@@ -184,6 +188,7 @@ echo '
 # Writing Conversation text
 #######################################################################
 '
+
 cat ${model_dir}/decode_${test_dir}_tgsmall/log/decode* | grep -v "LOG" | grep $input_file > $output_dir/${input_file}_segment
 if [ "$diarize" == "xvector" ]; then
 	cp exp/${test_sets}_${nnet_type}_seg_diarization/rttm $output_dir/${input_file}_rttm
@@ -196,7 +201,7 @@ if [ "$diarize" == "xvector" ]; then
 	spk=$(cat $output_dir/${input_file}_rttm | cut -d ' ' -f 4,8 | grep $start | cut -d ' ' -f 2)
 	[ ! -z "$spk" ] && echo ${spk} >> $output_dir/${input_file}_unsorted_rttm
 	seg=$(echo $lines | cut -d ' ' -f 1)
-	text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-) >> $output_dir/${input_file}_txt_temp
+	cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2- >> $output_dir/${input_file}_txt_temp
 	done
 	python sort_spk.py $output_dir/${input_file}_unsorted_rttm $output_dir/${input_file}_labels
 	paste -d ' ' $output_dir/${input_file}_labels $output_dir/${input_file}_txt_temp > ${output_dir}/${input_file}_txt
@@ -204,15 +209,14 @@ if [ "$diarize" == "xvector" ]; then
 fi
 
 if [ "$diarize" == "tdoa" ]; then
-start=1
-cat data/${test_sets}_${nnet_type}_seg/segments | while read lines
-do
-	seg=$(echo $lines | cut -d ' ' -f 1)
-	text=$(cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2-)
-	echo "Speaker "$(sed "${i}q;d" $output_dir/${input_file}_spk_rttm)": "$text
-	echo "Speaker "$(sed "${i}q;d" $output_dir/${input_file}_spk_rttm)": "$text >> ${output_dir}/${input_file}_txt
-	start=$(($start+1))
-done
+	cat data/${test_sets}_${nnet_type}_seg/segments | while read lines
+	do
+		seg=$(echo $lines | cut -d ' ' -f 1)
+		cat $output_dir/${input_file}_segment | grep $seg | cut -d ' ' -f 2- >> $output_dir/${input_file}_txt_temp
+
+	done
+	python sort_spk.py $output_dir/${input_file}_unsorted_rttm $output_dir/${input_file}_labels
+	paste -d ' ' $output_dir/${input_file}_labels $output_dir/${input_file}_txt_temp > ${output_dir}/${input_file}_txt
 fi
 
 cat  ${output_dir}/${input_file}_txt
