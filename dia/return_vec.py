@@ -2,6 +2,11 @@ import numpy as np
 import sys
 from statistics import mode
 import collections 
+from sklearn import metrics
+from sklearn.cluster import KMeans
+from sklearn.datasets import load_digits
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import scale
 
 def get_mod(n_num):
 	  
@@ -33,7 +38,14 @@ with open('out_beamform/'+sys.argv[1]+'.del','r') as f:
 			vec=[get_mod(ele1),get_mod(ele2),get_mod(ele3),get_mod(ele4)]
 			dic_list.append((i,vec))
 			i = i+1
-	
+
+#Doing K-means on TDOA segment vectors
+data=[]
+for i in range(len(dic_list)): 
+	data.append(dic_list[i][1]) 
+kmeans=	KMeans(init='k-means++', n_clusters=3, n_init=10), name="k-means++").fit(np.array(data))
+labels=kmeans.labels_
+'''	
 #Doing K-means on TDOA segment vectors
 num_spk = int(sys.argv[3])
 a=np.zeros((4,num_spk))
@@ -103,14 +115,22 @@ for i in range(1,len(dic_list)):
 		num=num+1
 		spk.append(num)
 		spk_list.append(dic_list[i][1])
+
 #Writing the labels file
 with open(sys.argv[4]+'/'+sys.argv[1]+'_spk_rttm','w') as f:		
 	for line in range(len(dic_list)):
 		f.write(spks[line]+'\n')
-with open(sys.argv[4]+'/'+sys.argv[1]+'_spk_rttm1','w') as f:		
-	for line in range(len(dic_list)):
-		f.write(spk[line]+'\n')
 		
+
+		
+'''	
+with open(sys.argv[4]+'/'+sys.argv[1]+'_unsorted_rttm','w') as f:		
+	for i in range(len(dic_list)):
+		f.write(str(labels[i]+1)+'\n')
+# Python program to print 
+# mode of elements 
+
+				
 			
 
 
