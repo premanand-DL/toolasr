@@ -17,7 +17,7 @@ num_chn = str2num(argv(){8});
 mask=argv(){9};
 
 if(denoise==1 && reverb==0)
-        disp(['Performing single-channel ' t_d ' filtering'])
+        disp(['Performing single-channel ' t_d ' denoising'])
 	for i=1:num_chn
 	  [y,fs]= audioread(['single_channel/' filename '.CH' num2str(i) '.wav']);
 	  if(strcmp(t_d,"wiener"))
@@ -32,7 +32,7 @@ if(denoise==1 && reverb==0)
 end
 
 if(denoise==1 && reverb==1)
-disp(['Performing single-channel ' t_d ' and ' t_r ' filtering'])
+disp(['Performing single-channel ' t_d ' denoising and ' t_r ' dereverberation'])
   for i=1:num_chn
 	  [y,fs]= audioread(['single_channel/' filename '.CH' num2str(i) '.wav']);
 	  if(strcmp(t_d,"wiener"))
@@ -66,7 +66,7 @@ end
 
 
 if(denoise==0 && reverb==1)
-disp(['Performing single-channel ' t_r ' filtering'])
+disp(['Performing single-channel ' t_r ' dereverberation'])
        	  if(strcmp(t_r,"wpe"))
              str=['./codes/dereverb/wpe1.py ' filename ' ' num2str(num_chn)];
              [~] = system(str);
@@ -112,8 +112,24 @@ if(strcmp(enhan,'mvdr') && strcmp(mask,"nn")) % Perform MVDR beamforming
  end
 audiowrite(['beamform/' filename '_mvdr_nn.wav'],y',fs);
 disp('Enhancing audio using MVDR NN mask ')
-cmd = ['python codes/beamform/nnmvdr.py codes/beamform/model_nnmask/mdl_adam/estimator_0.3827.pkl beamform/' filename '_mvdr_nn.wav'  ' --dump out_beamform'];
+cmd = ['python codes/beamform/nnmvdr.py --gev False codes/beamform/model_nnmask/mdl_adam/estimator_0.3827.pkl beamform/' filename '_mvdr_nn.wav'  ' --dump out_beamform'];
 [~]=system(cmd);
+disp('Enhancement Done')
+end
+
+
+if(strcmp(enhan,'gev') && strcmp(mask,"nn")) % Perform MVDR beamforming 
+   % initial few frames assumed to be silence
+ y = [];
+ for i=1:num_chn
+ [temp,fs] = audioread(['beamform/' filename '.CH' num2str(i) '.wav']);
+ y = [y;temp'];
+ end
+audiowrite(['beamform/' filename '_gev_nn.wav'],y',fs);
+disp('Enhancing audio using GEV NN mask ')
+cmd = ['python codes/beamform/nnmvdr.py codes/beamform/model_nnmask/mdl_adam/estimator_0.3827.pkl beamform/' filename '_gev_nn.wav'  ' --dump out_beamform'];
+[~]=system(cmd);
+disp('Enhancement Done')
 end
 
 
@@ -172,11 +188,12 @@ end;
 % audiowrite('Degrade_Spk1_MA4_NO.wav',y,Fs);
 % 
 if(strcmp(enhan,'dsb')) % Perform DSB Beanforming
-disp('Enhanced data using DSB stored in ')
+disp('Enhancing audio using DSB')
   [Y1,~] = DSB(X,TDOA);
   y1=istft_multi(Y1(:,:,1),nsampl).';
   y1=y1/max(abs(y1));
   Write_File( y1, Fs, [out_dir '_dsb.wav'] );
+disp('Enhancement Done')
   %audiowrite([out_dir 'DSB.wav'],y1,Fs);
 end% DSB
 
@@ -188,11 +205,23 @@ end% DSB
 disp(enhan)
 if(strcmp(enhan,'mvdr') && strcmp(mask,"ta")) % Perform MVDR beamforming 
    % initial few frames assumed to be silence	
-   disp('Enhancing audio using MVDR Time averaged mask  ')
+   disp('Enhancing audio using MVDR Time averaged mask')
    Y3 = MVDR(X,TDOA.',10);
    y3=istft_multi(Y3(:,:,1),nsampl).';
    y3=y3/max(abs(y3));
    Write_File(y3, Fs, [out_dir '_mvdr_ta.wav']);
+disp('Enhancement Done')
+end
+
+
+if(strcmp(enhan,'gev') && strcmp(mask,"ta")) % Perform MVDR beamforming 
+   % initial few frames assumed to be silence	
+   disp('Enhancing audio using GEV Time averaged mask')
+   Y3 = GEV(X,TDOA.',10);
+   y3=istft_multi(Y3(:,:,1),nsampl).';
+   y3=y3/max(abs(y3));
+   Write_File(y3, Fs, [out_dir '_gev_ta.wav']);
+disp('Enhancement Done')
 end
 
 
@@ -201,4 +230,3 @@ end
 %y4=istft_multi(Y4(:,:,1),nsampl).';
 %y4=y4/max(abs(y4));
 %audiowrite('MVDR_Gain_Spk3.wav',y4,Fs);
-
