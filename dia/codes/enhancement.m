@@ -12,9 +12,9 @@ denoise = str2num(argv(){4});
 reverb = str2num(argv(){5});
 t_d = argv(){6};
 t_r = argv(){7};
-disp([t_d t_r]);
 num_chn = str2num(argv(){8});
 mask=argv(){9};
+seq=argv(){10};
 
 if(denoise==1 && reverb==0)
         disp(['Performing single-channel ' t_d ' denoising'])
@@ -31,7 +31,7 @@ if(denoise==1 && reverb==0)
 	end
 end
 
-if(denoise==1 && reverb==1)
+if(denoise==1 && reverb==1 && strcmp(seq,"dr"))
 disp(['Performing single-channel ' t_d ' denoising and ' t_r ' dereverberation'])
   for i=1:num_chn
 	  [y,fs]= audioread(['single_channel/' filename '.CH' num2str(i) '.wav']);
@@ -64,9 +64,43 @@ disp(['Performing single-channel ' t_d ' denoising and ' t_r ' dereverberation']
 
 end
 
+if(denoise==1 && reverb==1 && strcmp(seq,"rd"))
+disp(['Performing single-channel ' t_r ' dereverberation and ' t_d ' denoising'])
+
+  if(strcmp(t_r,"wpe"))
+             str=['./codes/dereverb/wpe1.py ' filename ' ' num2str(num_chn)];
+             [~] = system(str);
+  end 
+  for i=1:num_chn  
+	[y,fs]= audioread(['single_channel/' filename '.CH' num2str(i) '.wav']); 
+	  if(strcmp(t_r,"nmf"))
+	parm.analysis = 1024; %window length (1024 corresonds to 64ms when fs = 16000 samples/s)
+	parm.hop = parm.analysis/4; %hop size
+	parm.win = sqrt(hamming(parm.analysis)); % window type
+	parm.Nframe = 20; % number of frames allocated for RIR
+	%CNMF
+	sparsity = 1;
+	[CNMF, ~] = dereverb_kl_divergence_new(y,sparsity,parm);
+	audiowrite(['beamform/' argv(){1} '.CH' num2str(i) '.wav'],CNMF,fs)
+    end
+ end
+  for i=1:num_chn
+	  [y,fs]= audioread(['beamform/' filename '.CH' num2str(i) '.wav']);
+	  if(strcmp(t_d,"wiener"))
+            output=wiener(y,fs,2);
+            audiowrite(['beamform/' argv(){1} '.CH' num2str(i) '.wav'],output,fs)
+	  end
+	  if(strcmp(t_d,"spec-sub"))
+	     output=spec_sub1(y,fs,1);
+	    audiowrite(['beamform/' argv(){1} '.CH' num2str(i) '.wav'],output,fs)
+          end
+  end
+
+
+end
+
 
 if(denoise==0 && reverb==1)
-disp(['Performing single-channel ' t_r ' dereverberation'])
        	  if(strcmp(t_r,"wpe"))
              str=['./codes/dereverb/wpe1.py ' filename ' ' num2str(num_chn)];
              [~] = system(str);
@@ -112,7 +146,7 @@ if(strcmp(enhan,'mvdr') && strcmp(mask,"nn")) % Perform MVDR beamforming
  end
 audiowrite(['beamform/' filename '_mvdr_nn.wav'],y',fs);
 disp('Enhancing audio using MVDR NN mask ')
-cmd = ['python codes/beamform/nnmvdr.py --gev False codes/beamform/model_nnmask/mdl_adam/estimator_0.3827.pkl beamform/' filename '_mvdr_nn.wav'  ' --dump out_beamform'];
+cmd = ['python codes/beamform/nnmvdr.py  codes/beamform/model_nnmask/mdl_adam/estimator_0.3827.pkl beamform/' filename '_mvdr_nn.wav' ' --gev False' ' --dump out_beamform'];
 [~]=system(cmd);
 disp('Enhancement Done')
 end
@@ -202,7 +236,7 @@ end% DSB
 % y2=y2/max(abs(y2));
 % audiowrite('MCA_Gain_Spk3.wav',y2,Fs);
 %
-disp(enhan)
+
 if(strcmp(enhan,'mvdr') && strcmp(mask,"ta")) % Perform MVDR beamforming 
    % initial few frames assumed to be silence	
    disp('Enhancing audio using MVDR Time averaged mask')
@@ -230,3 +264,4 @@ end
 %y4=istft_multi(Y4(:,:,1),nsampl).';
 %y4=y4/max(abs(y4));
 %audiowrite('MVDR_Gain_Spk3.wav',y4,Fs);
+

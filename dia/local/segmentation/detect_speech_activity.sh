@@ -42,7 +42,7 @@ extra_right_context_final=-1
 frames_per_chunk=150
 
 # Decoding options
-graph_opts="--min-silence-duration=0.03 --min-speech-duration=0.3 --max-speech-duration=10.0"
+graph_opts="--min-silence-duration=0.03 --min-speech-duration=2 --max-speech-duration=10.0"
 acwt=0.3
 
 # These <from>_in_<to>_weight represent the fraction of <from> probability 

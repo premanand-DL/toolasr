@@ -11,7 +11,7 @@ import numpy as np
 from torch.autograd import Variable
 
 from model import MaskComputer, MaskEstimator 
-from fgnt.beamforming import gev_wrapper_on_masks, mvdr_wrapper_on_masks 
+from fgnt.beamforming import gev_wrapper_on_masks, mvdr_wrapper_on_masks
 from fgnt.signal_processing import audioread, audiowrite, stft, istft
 import sys
 filename = sys.argv[1]
@@ -49,7 +49,7 @@ if __name__ == '__main__':
                         help="a list of wave to processed")
     parser.add_argument("--dump", type=str, default="enhan", dest="dump",
                         help="output directory of enhanced data")
-    parser.add_argument("--gev", action='store_true', default=True, dest="gev",
+    parser.add_argument("--gev", default=True,
                         help="apply GEV beamforming instead of MVDR")
     args = parser.parse_args()
     apply_beamfomer(args)

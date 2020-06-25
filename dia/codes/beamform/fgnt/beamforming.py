@@ -211,6 +211,23 @@ def gev_wrapper_on_masks(mix, noise_mask=None, target_mask=None,
 
     return output.T
 
+def get_steer_vector(target_psd_matrix):
+    """
+    Returns acoustic transfer function vector  
+    
+    :param target_psd_matrix: Clean PSD matrix(shape bins, sensors, sensors)
+    :return: steer_vector(shape bins, sensors) 
+    """
+
+    bins, sensors, _ = target_psd_matrix.shape
+    steer_vector = np.empty((bins, sensors), dtype=np.complex)
+    for f in range(bins):
+        eigenvals, eigenvecs = np.linalg.eig(target_psd_matrix[f, :, :])
+        steer_vector[f, :] = eigenvecs[:, np.argmax(eigenvals)]
+    return steer_vector 
+
+
+
 def mvdr_wrapper_on_masks(mix, noise_mask=None, target_mask=None):
 
     if noise_mask is None and target_mask is None:

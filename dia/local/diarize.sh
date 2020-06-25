@@ -16,7 +16,7 @@ ref_rttm=cat
 echo "$0 $@"  # Print the command line for logging
 if [ -f path.sh ]; then . ./path.sh; fi
 . parse_options.sh || exit 1;
-if [ $# != 4 ]; then
+if [ $# != 5 ]; then
   echo "Usage: $0 <model-dir> <in-data-dir> <out-dir>"
   echo "e.g.: $0 exp/xvector_nnet_1a  data/dev exp/dev_diarization"
   echo "Options: "
@@ -30,7 +30,7 @@ model_dir=$1
 data_in=$2
 out_dir=$3
 num_spk=$4
-
+extract_xvectors_only=$5
 name=`basename $data_in`
 
 for f in $data_in/feats.scp $data_in/segments $model_dir/plda \
@@ -72,6 +72,11 @@ if [ $stage -le 2 ]; then
     data/${name}_cmn $out_dir/xvectors_${name}
 fi
 
+if [ "$extract_xvectors_only" == true ]; then 
+  python local/compute_xvector_mean.py $out_dir/xvectors_${name}/xvector_txt $out_dir/xvectors_${name}/subsegments_data $out_dir/xvectors_${name}/mean_vec
+  cp $out_dir/xvectors_${name}/mean_vec $out_dir/mean_vec
+  exit 1
+fi
 
 # Perform PLDA scoring
 if [ $stage -le 3 ]; then

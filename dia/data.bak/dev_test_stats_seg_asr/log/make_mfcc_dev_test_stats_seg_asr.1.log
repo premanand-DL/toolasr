@@ -1,0 +1,20 @@
+# extract-segments scp,p:data/dev_test_stats_seg_asr/wav.scp data/dev_test_stats_seg_asr/log/segments.1 ark:- | compute-mfcc-feats --write-utt2dur=ark,t:data/dev_test_stats_seg_asr/log/utt2dur.1 --verbose=2 --config=conf/mfcc_hires_asr.conf ark:- ark:- | copy-feats --compress=true --write-num-frames=ark,t:data/dev_test_stats_seg_asr/log/utt2num_frames.1 ark:- ark,scp:/home/samit/kaldi/egs/toolasr/dia/data/dev_test_stats_seg_asr/data/raw_mfcc_dev_test_stats_seg_asr.1.ark,/home/samit/kaldi/egs/toolasr/dia/data/dev_test_stats_seg_asr/data/raw_mfcc_dev_test_stats_seg_asr.1.scp 
+# Started at Thu Jun 25 17:34:18 IST 2020
+#
+copy-feats --compress=true --write-num-frames=ark,t:data/dev_test_stats_seg_asr/log/utt2num_frames.1 ark:- ark,scp:/home/samit/kaldi/egs/toolasr/dia/data/dev_test_stats_seg_asr/data/raw_mfcc_dev_test_stats_seg_asr.1.ark,/home/samit/kaldi/egs/toolasr/dia/data/dev_test_stats_seg_asr/data/raw_mfcc_dev_test_stats_seg_asr.1.scp 
+compute-mfcc-feats --write-utt2dur=ark,t:data/dev_test_stats_seg_asr/log/utt2dur.1 --verbose=2 --config=conf/mfcc_hires_asr.conf ark:- ark:- 
+extract-segments scp,p:data/dev_test_stats_seg_asr/wav.scp data/dev_test_stats_seg_asr/log/segments.1 ark:- 
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0000040-0000416
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0000447-0000689
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0000721-0001498
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0001498-0002447
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0002447-0002867
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0002896-0003323
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0003379-0004401
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0004401-0005403
+LOG (extract-segments[5.5.681~1-5968b]:main():extract-segments.cc:194) Successfully processed 9 lines out of 9 in the segments file. 
+VLOG[2] (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:182) Processed features for key S07_tcs_mvdr_ta-0005403-0005700
+LOG (compute-mfcc-feats[5.5.681~1-5968b]:main():compute-mfcc-feats.cc:185)  Done 9 out of 9 utterances.
+LOG (copy-feats[5.5.681~1-5968b]:main():copy-feats.cc:143) Copied 9 feature matrices.
+# Accounting: time=0 threads=1
+# Ended (code 0) at Thu Jun 25 17:34:18 IST 2020, elapsed time 0 seconds

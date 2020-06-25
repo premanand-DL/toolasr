@@ -1,1 +1,1 @@
-S07_tcs_beamformit /home/samit/kaldi/egs/chime6/dia/mfcc/raw_mfcc_dev_test.1.ark:19
+S07_tcs_mvdr_ta /home/samit/kaldi/egs/toolasr/dia/mfcc/raw_mfcc_dev_test.1.ark:16

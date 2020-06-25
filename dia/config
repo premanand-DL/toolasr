@@ -1,7 +1,7 @@
 #!/bin/bash
 
 enhancement_only=false #If true, only the stage upto enhacement is performed on the multi-channel audio.
-dereverb=              #Optional {wpe,nmf}
+dereverb=wpe            #Optional {wpe,nmf}
 denoise=               #Optional {wiener, spec_sub}
 localize=gcc_phat      #If not specified 'gcc_phat' is default. Values: {gcc_phat, gcc_scot}_
 beamform=mvdr_ta     #If not specified 'mvdr_nn' is default. Values: {dsb, mvdr_ta, mvdr_nn, gev_ta, gev_nn, beamformit}
@@ -9,8 +9,10 @@ diarize=xvector        ##If not specified 'xtdoa' is default. Values: {xvector, 
 model_dir=exp/chain_cleaned/tdnn_1d_sp                #If not specified 'exp/chain_cleaned/tdnn_1d_sp'(Librispeech acoustic model) is the default model.
 graph_dir=exp/chain_cleaned/tdnn_1d_sp/graph_tgsmall          #If not specified 'exp/chain_cleaned/tdnn_1d_sp/graph'(Librispeech graph directory) is default.
 single_channel_decode=false  # If true, it will decode only single-channel file specified as a input file. In this case, the 
-                             # <input-file> should have complete filename                                                      
+                             # <input-file> should have complete filename 
+seq=dr  # The sequence in in which single channel enhancement is done. {dr: denoise and dereverberation and rd: dereverberation and denoising }                                                     
 #If you want to run decoding on TCS data then  using exp/nnet3_chain/tdnn_1d_sp as acoustic model dir and #If you want to run decoding on TCS data then use 'exp/nnet3_chain/tdnn_1d_sp' as acosutic model dir and 'exp/nnet3_chain/tdnn_1d_sp/graph' as the graph dir
 
  
+
 

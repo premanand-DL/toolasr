@@ -5,7 +5,7 @@ num_spk=$2
 output_dir=$3
 
 
-if [ $# -ne 3 ]; then
+if [ $# -le 2 ]; then
   echo "Usage: $0 [options] <input-filename> <num-of-speakers> <out-dir>"
   echo "If the file has path /home/user/audio/S01audio.CH1.wav, then just give /home/user/audio/S01audio as <input-filename> "
   echo "<num-of-speakers> should be in range from 2 to 7"
@@ -35,8 +35,8 @@ dereverb=
 
 . ./config
 
-ln -s ../../wsj/s5/steps .
-ln -s ../../wsj/s5/utils .
+#ln -s ../../wsj/s5/steps .
+#ln -s ../../wsj/s5/utils .
 # Read command line options
 ARGUMENT_LIST=(
     "dereverb"
@@ -132,36 +132,19 @@ reverb=1
 noise=1
 if [ -z "$dereverb" ] || [ -z "$denoise" ]; then
 
-if [ -z "$denoise" ] && [ ! -z "$dereverb" ] ; then
-#do dereverb only
+	if [ -z "$denoise" ] && [ ! -z "$dereverb" ] ; then
+	#do dereverb only
 
-reverb=1
-noise=0
-#do wpe
-if [ "$denoise" == "wpe" ]; then
-./codes/dereverb/wpe.py $input_file $num_c
-fi
-#do nmf
-if [ "$denoise" == "nmf" ]; then
-octave -q codes/denoising/enhance.m $input_file NMF $num_c
-fi
+	reverb=1
+	noise=0
 
-elif [ ! -z "$denoise" ] && [ -z "$dereverb" ]; then
-reverb=0
-noise=1
-if [ "$denoise" == "wiener" ]; then
-octave -q codes/denoising/enhance.m $input_file Wiener $num_c
-fi    
-
-#do denoise only
-if [ "$denoise" == "spec-sub" ]; then
-octave -q codes/denoising/enhance.m $input_file Spec-Sub $num_c
-fi
-
-else
-reverb=0
-noise=0
-fi
+	elif [ ! -z "$denoise" ] && [ -z "$dereverb" ]; then
+	reverb=0
+	noise=1
+	else
+	reverb=0
+	noise=0
+	fi
 
 fi
 
@@ -179,7 +162,7 @@ denoise=n
 fi 
 
 if [ ! -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then # If the file exists then proceed to diarization and ASR
-octave -q codes/enhancement.m $input_file $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask
+octave -q codes/enhancement.m $input_file $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask $seq
 [ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
 #diarization and ASR
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
@@ -195,6 +178,7 @@ echo Using the enhanced output from ${PWD}/out_beamform/${input_file}_${beamform
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
 fi
+
 
 
 

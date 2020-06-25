@@ -1,4 +1,4 @@
-H#!/usr/bin/python3
+#!/usr/bin/python3
 import numpy as np 
 import soundfile as sf 
 from tqdm import tqdm 
@@ -8,9 +8,10 @@ from nara_wpe.utils import stft, istft, get_stft_center_frequencies
 import sys
 
 basename=sys.argv[1]
-x=int(sys.argv[2])
+x= int(sys.argv[2])
 
 stft_options = dict(size=512, shift=128)
+print('Performing single-channel WPE')
 for i in range(x):
 	y,fs = sf.read('single_channel/'+basename+'.CH'+str(i+1)+'.wav')
 	Y=np.expand_dims(y	,axis=0)

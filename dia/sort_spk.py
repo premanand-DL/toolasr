@@ -23,4 +23,7 @@ for i in range(1,len(lines)):
 
 with open(sys.argv[2],'w') as f:
 	for i in range(len(spk)):
-		f.write('SPEAKER 'str(spk[i])+' :\n')
+		f.write('SPEAKER '+str(spk[i])+'\n')
+
+
+

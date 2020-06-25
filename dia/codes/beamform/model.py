@@ -130,7 +130,7 @@ class EstimatorTrainer(object):
         assert optimizer in ['rmsprop', 'adam']
         self.estimator = MaskEstimator(num_bins)
         if resume_state:
-            self.estimator.load_state_dict(th.load(resume_state))
+            self.estimator.load_state_dict(th.load(resume_state,map_location={'cuda:0': 'cpu'}))
             logging.info('resume from {}'.format(resume_state))
         logging.info('estimator structure: {}'.format(self.estimator))
         logging.info('initial learning_rate: {}'.format(learning_rate))
@@ -202,7 +202,7 @@ class MaskComputer(object):
         # setting evaluate mode
         self.estimator.eval()
         # default using GPU
-        self.estimator.cuda()
+        #self.estimator.cuda()
     
     def compute_masks(self, input_specs):
         # offload_to_gpu!

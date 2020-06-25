@@ -107,6 +107,7 @@ if [ $stage -le 4 ]; then
 echo 'Removing all earlier stored label and transcript files before starting diarization'
 rm -f $output_dir/${input_file}_*rttm* $output_dir/${input_file}_*txt_temp* $output_dir/${input_file}_*labels*
 if [ "$diarize" == "xvector" ]; then
+extract_xvectors_only=false
 echo '------Running x-vector feature diarization-------------'
   for datadir in ${test_sets}; do
     if $use_new_rttm_reference == "true"; then
@@ -119,25 +120,30 @@ echo '------Running x-vector feature diarization-------------'
       --ref-rttm $ref_rttm \
       exp/xvector_nnet_1a \
       data/${datadir}_${nnet_type}_seg \
-      exp/${datadir}_${nnet_type}_seg_diarization $num_spk
+      exp/${datadir}_${nnet_type}_seg_diarization $num_spk $extract_xvectors_only
+      
   done
 fi
 
-if [ "$diarize" == "tdoa" ] && [ "$single_channel_decode" == "false" ]; then
+if [[ ("$diarize" == "tdoa") || ("$diarize" == "xtdoa") ]] && [ "$single_channel_decode" == "false" ]; then
 	echo '------Running beamformit TDOA feature diarization-------------'
+	temp_file=$(echo $input_file | awk -F "_${beamform}" '{print $1}')
 	if [ "$beamform" != "beamformit" ];then
-		./run_beamformit.sh beamform $(echo $input_file | cut -d '_' -f 1)
-	python run_vec.py $input_file ${test_sets}_seg $num_spk $output_dir
+		./run_beamformit.sh beamform $temp_file
 	fi
+	[ "$diarize" == "tdoa" ] && python return_vec.py $temp_file ${test_sets}_${nnet_type}_seg $num_spk $output_dir/${temp_file}_${beamform} tdoa 
+	if [ "$diarize" == "xtdoa" ];then 
+	        extract_xvectors_only=true
+		    local/diarize.sh --nj $nj --cmd "$train_cmd" --stage $diarizer_stage \
+		      exp/xvector_nnet_1a \
+		      data/${test_sets}_${nnet_type}_seg \
+		      exp/${test_sets}_${nnet_type}_seg_diarization $num_spk $extract_xvectors_only
+	   
+           python return_vec.py $temp_file ${test_sets}_${nnet_type}_seg $num_spk $output_dir/${temp_file}_${beamform} xtdoa
+	fi
+	
 fi
 
-if [ "$diarize" == "xtdoa" ] && [ "$single_channel_decode" == "false" ]; then
-	echo '------Running beamformit TDOA feature diarization-------------'
-	if [ "$beamform" != "beamformit" ];then
-		./run_beamformit.sh beamform $(echo $input_file | cut -d '_' -f 1)
-	python run_vec.py $input_file ${test_sets}_seg $num_spk $output_dir xtdoa
-	fi
-fi
 
 fi
 
@@ -208,7 +214,7 @@ if [ "$diarize" == "xvector" ]; then
 	#echo "Speaker "$spk": "$text >> ${output_dir}/${input_file}_txt
 fi
 
-if [ "$diarize" == "tdoa" ]; then
+if [[ ("$diarize" == "tdoa")  || ("$diarize" == "xtdoa") ]]; then
 	cat data/${test_sets}_${nnet_type}_seg/segments | while read lines
 	do
 		seg=$(echo $lines | cut -d ' ' -f 1)
@@ -220,3 +226,4 @@ if [ "$diarize" == "tdoa" ]; then
 fi
 
 cat  ${output_dir}/${input_file}_txt
+

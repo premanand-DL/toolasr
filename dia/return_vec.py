@@ -7,6 +7,8 @@ from sklearn.cluster import KMeans
 from sklearn.datasets import load_digits
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import scale
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.metrics import pairwise_distances
 
 def get_mod(n_num):
 	  
@@ -18,6 +20,7 @@ def get_mod(n_num):
 	get_mode = dict(data) 
 	mode = [k for k, v in get_mode.items() if v == max(list(data.values()))]
 	return(mode[0])
+print('Extracting segment based TDOA vectors')
 with open('out_beamform/'+sys.argv[1]+'.del','r') as f:
 	list1=f.readlines()
 	with open('data/'+sys.argv[2]+'/segments','r') as s:
@@ -38,13 +41,33 @@ with open('out_beamform/'+sys.argv[1]+'.del','r') as f:
 			vec=[get_mod(ele1),get_mod(ele2),get_mod(ele3),get_mod(ele4)]
 			dic_list.append((i,vec))
 			i = i+1
+num_spk=int(sys.argv[3])
+if (sys.argv[5] == "tdoa"):
+	print('Doing K-means on TDOA segment vectors')
+	data=[]
+	for i in range(len(dic_list)): 	
+		data.append(dic_list[i][1]) 
+	kmeans = KMeans(init='k-means++', n_clusters=num_spk, n_init=10).fit(np.array(data))
+	labels=kmeans.labels_
 
-#Doing K-means on TDOA segment vectors
-data=[]
-for i in range(len(dic_list)): 
-	data.append(dic_list[i][1]) 
-kmeans=	KMeans(init='k-means++', n_clusters=3, n_init=10), name="k-means++").fit(np.array(data))
-labels=kmeans.labels_
+if (sys.argv[5] == "xtdoa"):
+	with open ('exp/'+sys.argv[2]+'_diarization/mean_vec','r') as f:
+		vect_l = f.readlines()
+	list_vec=[]
+	#print(len(vect_l),len(dic_list))
+	for i in range(len(vect_l)):
+		if (len(vect_l) != len(dic_list)):
+			print('Error when extracting segments, check segmentation')
+			sys.exit()
+		vec = np.array([np.float(x) for x in vect_l[i].strip().split(' ')])
+		con_vector = np.concatenate((vec,np.array(dic_list[i][1])),axis=0)
+		list_vec.append(con_vector)
+	print('Perform clustering, Cosine distance and agglomorative hierarchrical')
+	model = AgglomerativeClustering(n_clusters=num_spk,linkage="average", affinity="cosine")
+	model.fit(np.array(list_vec))
+	labels = model.labels_
+
+	
 '''	
 #Doing K-means on TDOA segment vectors
 num_spk = int(sys.argv[3])
@@ -123,8 +146,9 @@ with open(sys.argv[4]+'/'+sys.argv[1]+'_spk_rttm','w') as f:
 		
 
 		
-'''	
-with open(sys.argv[4]+'/'+sys.argv[1]+'_unsorted_rttm','w') as f:		
+'''
+print('Writing the labels file')	
+with open(sys.argv[4]+'_unsorted_rttm','w') as f:		
 	for i in range(len(dic_list)):
 		f.write(str(labels[i]+1)+'\n')
 # Python program to print 
@@ -136,4 +160,5 @@ with open(sys.argv[4]+'/'+sys.argv[1]+'_unsorted_rttm','w') as f:
 
 	
 	
+
 
