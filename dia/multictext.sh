@@ -94,15 +94,18 @@ while true; do
     shift
 done
 
+
+if [ "$single_channel_decode" == true ];then
+[[ ("$single_channel_decode" == "true" ) && ("$diarize" == "tdoa") || ("$diarize" == "xtdoa") ]] && echo 'Need Multi-audio data for '${diarize}' diarizatiion method, hence using the x-vector diarization method '
+path=$input_file
+./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
+exit 1
+fi
+
 num_c=$(ls ${input_file}* | wc -l)
 cp ${input_file}* single_channel/
 input_file=$(echo $input_file | rev | cut -d '/' -f 1 | rev )
 
-if [ "$single_channel_decode" == true ];then
-[[ ("$single_channel_decode" == "true" ) && ("$diarize" == "tdoa") || ("$diarize" == "xtdoa") ]] && echo 'Need Multi-audio data for '${diarize}' diarizatiion method' && exit 1
-path=$input_file
-./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
-fi
 
 #default arguments
 if [ -z "$localize" ]; then
