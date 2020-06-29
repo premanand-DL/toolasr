@@ -104,7 +104,15 @@ exit 1
 fi
 
 num_c=$(ls ${input_file}* | wc -l)
-cp ${input_file}* single_channel/
+#Get Sampling rate and downsampke to 16KHz
+sam_fre=$(sox --i -r ${input_file}.CH1.wav)  
+if [ "${sam_fre}" != "16000" ]; then
+	for i in $(eval echo {1..$num_c});do
+	 sox single_channel/${input_file}.CH${i}.wav -c 1 -r 16000 single_channel/${input_file}.CH${i}.wav
+	done
+else	
+        cp ${input_file}* single_channel/
+fi	
 input_file=$(echo $input_file | rev | cut -d '/' -f 1 | rev )
 
 
@@ -121,13 +129,7 @@ if [ -z "$diarize" ]; then
 diarize=xvector
 fi
 
-#Get Sampling rate and downsampke to 16KHz
-sam_fre=$(sox --i -r single_channel/${input_file}.CH1.wav)  
-if [ "${sam_fre}" != "16000" ]; then
-	for i in $(eval echo {1..$num_c});do
-	 sox single_channel/${input_file}.CH${i}.wav -c 1 -r 16000 single_channel/${input_file}.CH${i}.wav
-	done
-fi
+
 
 
 #Options to run single-channel enhancement before beamforming
