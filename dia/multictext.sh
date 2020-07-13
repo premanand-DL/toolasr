@@ -5,6 +5,7 @@ num_spk=$2
 output_dir=$3
 #
 #author: Sachin Nayak
+#From IIT Bombay, Mumbai
 #
 echo "------------------------------------------------------------------------------
                     TCS - IIT B Rich Text Transcription tool 
@@ -104,6 +105,7 @@ while true; do
 done
 
 echo "Using the configuration from 'config'"
+echo "You can change the configuration arguments using this file"
 echo "Configuration used:"
 
 if [ "$single_channel_decode" == "true" ]; then
