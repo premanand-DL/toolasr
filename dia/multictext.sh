@@ -3,7 +3,14 @@
 input_file=$1
 num_spk=$2
 output_dir=$3
-
+#
+#author: Sachin Nayak
+#
+echo "------------------------------------------------------------------------------
+                    TCS - IIT B Rich Text Transcription tool 
+      ------------------------------------------------------------------------------"
+		    
+echo 
 
 if [ $# -le 2 ]; then
   echo "Usage: $0 [options] <input-filename> <num-of-speakers> <out-dir>"
@@ -22,6 +29,12 @@ if [ $# -le 2 ]; then
   exit 1;
 fi
 
+[[ $num_spk != ?(-)+([2-7]) ]] && echo "Either $num_spk is not integer or out of limits for number of speakers" && exit 1
+denoise=
+dereverb=
+
+. ./config
+
 echo "-----------------------------------------------------------------"
 echo "-----------------------------------------------------------------"
 echo "                         Initialiazing                     "
@@ -29,11 +42,7 @@ echo "                         Initialiazing                     "
 echo "-----------------------------------------------------------------"
 echo "-----------------------------------------------------------------"
 
-[[ $num_spk != ?(-)+([2-7]) ]] && echo "Either $num_spk is not integer or out of limits for number of speakers" && exit 1
-denoise=
-dereverb=
 
-. ./config
 
 #ln -s ../../wsj/s5/steps .
 #ln -s ../../wsj/s5/utils .
@@ -94,6 +103,18 @@ while true; do
     shift
 done
 
+echo "Using the configuration from 'config'"
+echo "Configuration used:"
+
+if [ "$single_channel_decode" == "true" ]; then
+echo "Doing single-channel Decoding"
+else
+[ ! - z "$denoise" ] && echo Denoising       - $denoise
+[ ! - z "$dereverb" ] && echo Dereverberation - $dereverb
+[ ! - z "$localize" ] && echo Localization    - $localize
+[ ! - z "$beamform" ] && echo Beamforming     - $beamform
+[ ! - z "$diarize" ] && echo Diarization     - $diarize
+fi
 
 if [ "$single_channel_decode" == true ];then
 [[ ("$single_channel_decode" == "true" ) && ("$diarize" == "tdoa") || ("$diarize" == "xtdoa") ]] && echo 'Need Multi-audio data for '${diarize}' diarizatiion method, hence using the x-vector diarization method '
