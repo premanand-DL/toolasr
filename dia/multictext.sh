@@ -104,7 +104,7 @@ while true; do
     shift
 done
 
-echo "Using the configuration from 'config'"
+echo "Using the configuration from 'config' file"
 echo "You can change the configuration arguments using this file"
 echo "Configuration used:"
 
