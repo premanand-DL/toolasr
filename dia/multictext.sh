@@ -111,11 +111,11 @@ echo "Configuration used:"
 if [ "$single_channel_decode" == "true" ]; then
 echo "Doing single-channel Decoding"
 else
-[ ! - z "$denoise" ] && echo Denoising       - $denoise
-[ ! - z "$dereverb" ] && echo Dereverberation - $dereverb
-[ ! - z "$localize" ] && echo Localization    - $localize
-[ ! - z "$beamform" ] && echo Beamforming     - $beamform
-[ ! - z "$diarize" ] && echo Diarization     - $diarize
+[ ! -z "$denoise" ] && echo Denoising       - $denoise
+[ ! -z "$dereverb" ] && echo Dereverberation - $dereverb
+[ ! -z "$localize" ] && echo Localization    - $localize
+[ ! -z "$beamform" ] && echo Beamforming     - $beamform
+[ ! -z "$diarize" ] && echo Diarization     - $diarize
 fi
 
 if [ "$single_channel_decode" == true ];then
