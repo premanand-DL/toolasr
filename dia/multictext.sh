@@ -122,6 +122,9 @@ if [ "$single_channel_decode" == true ];then
 [[ ("$single_channel_decode" == "true" ) && ("$diarize" == "tdoa") || ("$diarize" == "xtdoa") ]] && echo 'Need Multi-audio data for '${diarize}' diarizatiion method, hence using the x-vector diarization method '
 path=$input_file
 diarize=xvector
+dur=$(echo $(soxi -D $path)| bc)
+echo It will take roughly $(echo $dur*22/55/60 | bc) minutes to complete the decoding '(depends on the CPU)'
+echo
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
 exit 1
 fi
@@ -137,7 +140,7 @@ else
         cp ${input_file}* single_channel/
 fi	
 input_file=$(echo $input_file | rev | cut -d '/' -f 1 | rev )
-
+dur=$(echo $(soxi -D single_channel/${input_file}.CH1.wav)| bc)
 
 #default arguments
 if [ -z "$localize" ]; then
@@ -166,17 +169,21 @@ if [ -z "$dereverb" ] || [ -z "$denoise" ]; then
 
 	reverb=1
 	noise=0
+	echo It will take roughly $(echo $dur*28/55/60 | bc) minutes to complete the enhancement '(depends on the CPU)'
 
 	elif [ ! -z "$denoise" ] && [ -z "$dereverb" ]; then
+	echo It will take about $(echo $dur*28/55/60 | bc) minutes to complete the enhancement
 	reverb=0
 	noise=1
 	else
+	echo It will take roughly $(echo $dur*18/55/60 | bc) minutes to complete the enhancement '(depends on the CPU)'
 	reverb=0
 	noise=0
 	fi
 
+else
+echo It will take roughly $(echo $dur*35/55/60 | bc) minutes to complete the enhancement '(depends on the CPU)'
 fi
-
 
 #Beamforming
 mask=$(echo $beamform | cut -d '_' -f 2)
@@ -193,6 +200,7 @@ fi
 if [ ! -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then # If the file exists then proceed to diarization and ASR
 octave -q codes/enhancement.m $input_file $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask $seq
 [ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
+echo It will take roughly $(echo $dur*25/55/60 | bc) minutes to complete the decoding '(depends on the CPU)'
 #diarization and ASR
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
@@ -200,10 +208,11 @@ exit 1
 fi
 
 [ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
-
+echo "Using this enhanced audio for decoding"
 if [ -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then
 echo Using the enhanced output from ${PWD}/out_beamform/${input_file}_${beamform}.wav
 #diarization and ASR
+echo It will take roughly $(echo $dur*25/55/60 | bc) minutes to complete the decoding '(depends on the CPU)'
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
 fi
