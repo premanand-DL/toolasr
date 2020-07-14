@@ -20,7 +20,7 @@ def get_mod(n_num):
 	get_mode = dict(data) 
 	mode = [k for k, v in get_mode.items() if v == max(list(data.values()))]
 	return(mode[0])
-print('Extracting segment based TDOA vectors')
+print('TCS-IITB>> Extracting segment based TDOA vectors')
 with open('out_beamform/'+sys.argv[1]+'.del','r') as f:
 	list1=f.readlines()
 	with open('data/'+sys.argv[2]+'/segments','r') as s:
@@ -43,7 +43,7 @@ with open('out_beamform/'+sys.argv[1]+'.del','r') as f:
 			i = i+1
 num_spk=int(sys.argv[3])
 if (sys.argv[5] == "tdoa"):
-	print('Doing K-means on TDOA segment vectors')
+	print('TCS-IITB>> Doing K-means on TDOA segment vectors')
 	data=[]
 	for i in range(len(dic_list)): 	
 		data.append(dic_list[i][1]) 
@@ -62,7 +62,7 @@ if (sys.argv[5] == "xtdoa"):
 		vec = np.array([np.float(x) for x in vect_l[i].strip().split(' ')])
 		con_vector = np.concatenate((vec,np.array(dic_list[i][1])),axis=0)
 		list_vec.append(con_vector)
-	print('Perform clustering, Cosine distance and agglomorative hierarchrical')
+	print('TCS-IITB>> Perform clustering, Cosine distance and agglomorative hierarchrical')
 	model = AgglomerativeClustering(n_clusters=num_spk,linkage="average", affinity="cosine")
 	model.fit(np.array(list_vec))
 	labels = model.labels_
@@ -147,7 +147,7 @@ with open(sys.argv[4]+'/'+sys.argv[1]+'_spk_rttm','w') as f:
 
 		
 '''
-print('Writing the labels file')	
+print('TCS-IITB>> Writing the labels file')	
 with open(sys.argv[4]+'_unsorted_rttm','w') as f:		
 	for i in range(len(dic_list)):
 		f.write(str(labels[i]+1)+'\n')
