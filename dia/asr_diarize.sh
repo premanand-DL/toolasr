@@ -1,5 +1,7 @@
 #!/bin/bash
 # This script is used to go diarization and then ASR for the input single channel audio
+#author: Sachin Nayak
+#From IIT Bombay, Mumbai
 
 . ./config
 diarize=$1
@@ -25,7 +27,7 @@ diarizer_stage=0
 
 echo '
 #######################################################################
-# Perform DATA Prepration
+TCS-IITB>> Starting Diarization
 #######################################################################
 '
 if [ $stage -le 1 ];then
@@ -52,9 +54,10 @@ fi
 
 echo '
 #######################################################################
-# Perform feature extraction for SAD
+TCS-IITB>> Perform feature extraction for SAD
 #######################################################################
 '
+start=`date +%s`
 if [ $stage -le 2 ]; then
   # mfccdir should be some place with a largish disk where you
   # want to store MFCC features.
@@ -65,12 +68,17 @@ if [ $stage -le 2 ]; then
       data/$x exp/make_mfcc/$x $mfccdir
   done
 fi
-
+end=`date +%s`
+runtime=$((end-start))
+echo
+echo "TCS-IITB>> Elapsed time is ${runtime} seconds for SAD feature extraction"
+echo 
 echo '
 #######################################################################
-# Perform SAD on the recording for obtaining segments
+TCS-IITB>> Perform SAD on the recording for obtaining segments
 #######################################################################
 '
+start=`date +%s`
 dir=exp/segmentation${affix}
 sad_work_dir=exp/sad${affix}_${nnet_type}/
 sad_nnet_dir=$dir/tdnn_${nnet_type}_sad_1a
@@ -95,13 +103,17 @@ if [ $stage -le 3 ]; then
  done
 fi
 
-
+end=`date +%s`
+runtime=$((end-start))
+echo
+echo "TCS-IITB>> Elapsed time is ${runtime} seconds for segmentation"
+echo 
 echo '
 #######################################################################
-# Perform diarization on the dev/eval data
+TCS-IITB>> Perform diarization on the dev/eval data
 #######################################################################
 '
-
+start=`date +%s`
 mkdir -p $output_dir
 if [ $stage -le 4 ]; then
 echo 'Removing all earlier stored label and transcript files before starting diarization'
@@ -144,12 +156,16 @@ if [[ ("$diarize" == "tdoa") || ("$diarize" == "xtdoa") ]] && [ "$single_channel
 	
 fi
 
-
+end=`date +%s`
+runtime=$((end-start))
+echo
+echo "TCS-IITB>> Elapsed time is ${runtime} seconds for diarization feature extraction and clustering"
+echo 
 fi
 
 echo '
 #######################################################################
-# Perform ASR using diarization time stamps
+TCS-IITB>> Perform ASR using diarization time stamps
 #######################################################################
 '
 test_dir=${test_sets}_${nnet_type}_seg_asr
@@ -161,37 +177,60 @@ cp data/${test_sets}_${nnet_type}_seg/{segments,wav.scp,spk2utt,utt2spk} data/$t
 #model_dir=exp/chain_cleaned/tdnn_1d_sp
 #graph_dir=$dir/graph_tgsmall
 if [ $stage -le 5 ]; then
+start=`date +%s`
 for datadir in ${test_dir}; do
     steps/make_mfcc.sh --nj $nj --mfcc-config conf/mfcc_hires_asr.conf \
       --cmd "$train_cmd" data/${datadir}
     steps/compute_cmvn_stats.sh data/${datadir}
     utils/fix_data_dir.sh data/${datadir}
 done
+
+end=`date +%s`
+runtime=$((end-start))
+echo
+echo "TCS-IITB>> Elapsed time is ${runtime} seconds for extracting MFCC for decoding"  
+echo 
 fi
 
 if [ $stage -le 6 ]; then
+start=`date +%s`
 data=$test_dir
 nspk=1
 steps/online/nnet2/extract_ivectors_online.sh --cmd "$train_cmd" --nj "${nspk}" \
       data/${data} exp/nnet3_cleaned/extractor \
       exp/nnet3_cleaned/ivectors_${data}
+      
+end=`date +%s`
+runtime=$((end-start))
+echo
+echo "TCS-IITB>> Elapsed time is ${runtime} seconds for extracting ivectors"   
+echo 
 fi
 
 
-if [ $stage -le 8 ]; then
-[ ! -f "${graph_dir}/HCLG.fst" ] && utils/mkgraph.sh --self-loop-scale 1.0 --remove-oov \
-  data/lang ${model_dir} $graph_dir
 
+if [ $stage -le 8 ]; then
+start=`date +%s`
+[ ! -f "${graph_dir}/HCLG.fst" ] && utils/mkgraph.sh --self-loop-scale 1.0 --remove-oov \
+  data/lang ${model_dir} $graph_dir && end=`date +%s` && runtime=$((end-start)) && echo "TCS-IITB>> It took ${runtime} seconds to build the graph"
+  
+start=`date +%s`  
 decode_set=$test_dir
 steps/nnet3/decode.sh --acwt 1.0 --post-decode-acwt 10.0 \
     --nj ${nj} --cmd "$decode_cmd" \
     --online-ivector-dir exp/nnet3_cleaned/ivectors_${decode_set} \
     $graph_dir data/${decode_set} ${model_dir}/decode_${decode_set}_tgsmall
+    
+end=`date +%s`
+runtime=$((end-start))
+echo 
+echo "TCS-IITB>> Elapsed time is ${runtime} seconds for decoding"   
+echo 
 fi
 
 echo '
 #######################################################################
-# Writing Conversation text
+TCS-IITB>> Writing Conversation text
 #######################################################################
 '
 
@@ -224,6 +263,10 @@ if [[ ("$diarize" == "tdoa")  || ("$diarize" == "xtdoa") ]]; then
 	python sort_spk.py $output_dir/${input_file}_unsorted_rttm $output_dir/${input_file}_labels
 	paste -d ' ' $output_dir/${input_file}_labels $output_dir/${input_file}_txt_temp > ${output_dir}/${input_file}_txt
 fi
-
+echo "******************************************************************"
+echo
 cat  ${output_dir}/${input_file}_txt
-
+echo
+echo "******************************************************************"
+echo
+echo "Succesfully decoded ${audiopath}"
