@@ -1,5 +1,5 @@
 echo =============================================================
-echo " Running Beamformit"
+echo "TCS-IITB>> Running Beamformit"
 echo =============================================================
 . ./cmd.sh
 . ./path.sh
