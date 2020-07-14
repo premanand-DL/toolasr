@@ -8,7 +8,7 @@ output_dir=$3
 #From IIT Bombay, Mumbai
 #
 echo "------------------------------------------------------------------------------
-                    TCS - IIT B Rich Text Transcription tool 
+                    TCS-IITB RICH TRANSCRIPTION TOOL 
       ------------------------------------------------------------------------------"
 		    
 echo 
@@ -30,7 +30,7 @@ if [ $# -le 2 ]; then
   exit 1;
 fi
 
-[[ $num_spk != ?(-)+([2-7]) ]] && echo "Either $num_spk is not integer or out of limits for number of speakers" && exit 1
+[[ $num_spk != ?(-)+([2-7]) ]] && echo "TCS-IITB>> Either $num_spk is not integer or out of limits for number of speakers" && exit 1
 denoise=
 dereverb=
 
@@ -104,18 +104,18 @@ while true; do
     shift
 done
 
-echo "Using the configuration from 'config' file"
-echo "You can change the configuration arguments using this file"
-echo "Configuration used:"
+echo "TCS-IITB>> Using the configuration from 'config' file"
+echo "TCS-IITB>> You can change the configuration arguments using this file"
+echo "           Configuration used:"
 
 if [ "$single_channel_decode" == "true" ]; then
-echo "Doing single-channel Decoding"
+echo "           Doing single-channel Decoding"
 else
-[ ! -z "$denoise" ] && echo Denoising       - $denoise
-[ ! -z "$dereverb" ] && echo Dereverberation - $dereverb
-[ ! -z "$localize" ] && echo Localization    - $localize
-[ ! -z "$beamform" ] && echo Beamforming     - $beamform
-[ ! -z "$diarize" ] && echo Diarization     - $diarize
+[ ! -z "$denoise" ] && echo "            Denoising       - ${denoise}"
+[ ! -z "$dereverb" ] && echo "           Dereverberation - ${dereverb}"
+[ ! -z "$localize" ] && echo "           Localization    - ${localize}"
+[ ! -z "$beamform" ] && echo "           Beamforming     - ${beamform}"
+[ ! -z "$diarize" ] && echo "           Diarization     - ${diarize}"
 fi
 
 if [ "$single_channel_decode" == true ];then
@@ -123,7 +123,7 @@ if [ "$single_channel_decode" == true ];then
 path=$input_file
 diarize=xvector
 dur=$(echo $(soxi -D $path)| bc)
-echo It will take roughly $(echo $dur*25/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'
+#echo "TCS-IITB>> It will take roughly $(echo $dur*25/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'"
 echo
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
 exit 1
@@ -169,20 +169,20 @@ if [ -z "$dereverb" ] || [ -z "$denoise" ]; then
 
 	reverb=1
 	noise=0
-	echo It will take roughly $(echo $dur*32/55/60 | bc -l) minutes to complete the enhancement '(depends on the CPU)'
+	#echo "TCS-IITB>> It will take roughly $(echo $dur*32/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'"
 
 	elif [ ! -z "$denoise" ] && [ -z "$dereverb" ]; then
-	echo It will take about $(echo $dur*32/55/60 | bc -l) minutes to complete the enhancement
+	#echo It will take about $(echo $dur*32/55/60 | bc -l) minutes to complete the enhancement
 	reverb=0
 	noise=1
 	else
-	echo It will take roughly $(echo $dur*22/55/60 | bc -l) minutes to complete the enhancement '(depends on the CPU)'
+	#echo It will take roughly $(echo $dur*22/55/60 | bc -l) minutes to complete the enhancement '(depends on the CPU)'
 	reverb=0
 	noise=0
 	fi
 
 else
-echo It will take roughly $(echo $dur*40/55/60 | bc -l) minutes to complete the enhancement '(depends on the CPU)'
+#echo It will take roughly $(echo $dur*40/55/60 | bc -l) minutes to complete the enhancement '(depends on the CPU)'
 fi
 
 #Beamforming
@@ -202,17 +202,17 @@ octave -q codes/enhancement.m $input_file $localize $beamforming $noise $reverb 
 [ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
 echo It will take roughly $(echo $dur*30/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'
 #diarization and ASR
+echo "TCS-IITB>> Using the enhanced beamformed audio for decoding"
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
 exit 1
 fi
 
-[ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
-echo "Using this enhanced audio for decoding"
+[ "$enhancement_only" == true ] && echo "TCS-IITB>> Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav" && exit 1
+echo "TCS-IITB>> Using this enhanced beamformed audio for decoding from ${PWD}/out_beamform/${input_file}_${beamform}.wav"
 if [ -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then
-echo Using the enhanced output from ${PWD}/out_beamform/${input_file}_${beamform}.wav
 #diarization and ASR
-echo It will take roughly $(echo $dur*30/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'
+#echo It will take roughly $(echo $dur*30/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
 fi
