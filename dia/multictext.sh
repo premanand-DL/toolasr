@@ -125,7 +125,12 @@ diarize=xvector
 dur=$(echo $(soxi -D $path)| bc)
 #echo "TCS-IITB>> It will take roughly $(echo $dur*25/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'"
 echo
+echo "TCS-IITB>> Doing decoding on the single channel audio at ${path}"
+start=`date +%s`
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
+end=`date +%s`
+runtime=$((end-start))
+echo "TCS-IITB>> It took ${runtime} seconds to do diarization and ASR"
 exit 1
 fi
 
@@ -133,9 +138,16 @@ num_c=$(ls ${input_file}* | wc -l)
 #Get Sampling rate and downsampke to 16KHz
 sam_fre=$(sox --i -r ${input_file}.CH1.wav)  
 if [ "${sam_fre}" != "16000" ]; then
+        echo "TCS-IITB>> Since the audio sampling frequency is higher then 16KHz, downsampling to 16KHz"
+	start=`date +%s`
 	for i in $(eval echo {1..$num_c});do
 	 sox single_channel/${input_file}.CH${i}.wav -c 1 -r 16000 single_channel/${input_file}.CH${i}.wav
 	done
+	end=`date +%s`
+	runtime=$((end-start))
+	echo "TCS-IITB>> It took ${runtime} seconds to do downsampling"
+	
+	
 else	
         cp ${input_file}* single_channel/
 fi	
@@ -166,11 +178,8 @@ if [ -z "$dereverb" ] || [ -z "$denoise" ]; then
 
 	if [ -z "$denoise" ] && [ ! -z "$dereverb" ] ; then
 	#do dereverb only
-
 	reverb=1
 	noise=0
-	#echo "TCS-IITB>> It will take roughly $(echo $dur*32/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'"
-
 	elif [ ! -z "$denoise" ] && [ -z "$dereverb" ]; then
 	#echo It will take about $(echo $dur*32/55/60 | bc -l) minutes to complete the enhancement
 	reverb=0
@@ -180,9 +189,6 @@ if [ -z "$dereverb" ] || [ -z "$denoise" ]; then
 	reverb=0
 	noise=0
 	fi
-
-else
-#echo It will take roughly $(echo $dur*40/55/60 | bc -l) minutes to complete the enhancement '(depends on the CPU)'
 fi
 
 #Beamforming
@@ -198,23 +204,37 @@ denoise=n
 fi 
 
 if [ ! -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then # If the file exists then proceed to diarization and ASR
+start=`date +%s`
 octave -q codes/enhancement.m $input_file $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask $seq
-[ "$enhancement_only" == true ] && echo Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav && exit 1
-echo It will take roughly $(echo $dur*30/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'
+end=`date +%s`
+runtime=$((end-start))
+echo "TCS-IITB>> It took ${runtime} seconds to do the enhancement"
+
+[ "$enhancement_only" == true ] && echo "TCS-IITB>> Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav" && exit 1
+
 #diarization and ASR
 echo "TCS-IITB>> Using the enhanced beamformed audio for decoding"
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
+start=`date +%s`
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
+end=`date +%s`
+runtime=$((end-start))
+echo "TCS-IITB>> It took a total of ${runtime} seconds to do diarization and ASR"
 exit 1
 fi
 
-[ "$enhancement_only" == true ] && echo "TCS-IITB>> Enhanced audio is stored at $PWD/out_beamform/${input_file}_${beamform}.wav" && exit 1
+echo "TCS-IITB>> Enhanced audio already exists, it is doing decoding on the already stored audio"
 echo "TCS-IITB>> Using this enhanced beamformed audio for decoding from ${PWD}/out_beamform/${input_file}_${beamform}.wav"
+
 if [ -f "${PWD}/out_beamform/${input_file}_${beamform}.wav" ]; then
 #diarization and ASR
 #echo It will take roughly $(echo $dur*30/55/60 | bc -l) minutes to complete the decoding '(depends on the CPU)'
 path=$PWD/out_beamform/${input_file}_${beamform}.wav
+start=`date +%s`
 ./asr_diarize.sh $diarize $path ${input_file}_${beamform} $output_dir $enhancement_only $num_spk $beamform
+end=`date +%s`
+runtime=$((end-start))
+echo "TCS-IITB>> It took a total of ${runtime} seconds to do diarization and ASR"
 fi
 
 
