@@ -17,7 +17,7 @@ mask=argv(){9};
 seq=argv(){10};
 
 if(denoise==1 && reverb==0)
-        disp(['Performing single-channel ' t_d ' denoising'])
+        disp(['TCS-IITB>> Performing single-channel ' t_d ' denoising'])
 	for i=1:num_chn
 	  [y,fs]= audioread(['single_channel/' filename '.CH' num2str(i) '.wav']);
 	  if(strcmp(t_d,"wiener"))
@@ -32,7 +32,7 @@ if(denoise==1 && reverb==0)
 end
 
 if(denoise==1 && reverb==1 && strcmp(seq,"dr"))
-disp(['Performing single-channel ' t_d ' denoising and ' t_r ' dereverberation'])
+disp(['TCS-IITB>> Performing single-channel ' t_d ' denoising and ' t_r ' dereverberation'])
   for i=1:num_chn
 	  [y,fs]= audioread(['single_channel/' filename '.CH' num2str(i) '.wav']);
 	  if(strcmp(t_d,"wiener"))
@@ -65,7 +65,7 @@ disp(['Performing single-channel ' t_d ' denoising and ' t_r ' dereverberation']
 end
 
 if(denoise==1 && reverb==1 && strcmp(seq,"rd"))
-disp(['Performing single-channel ' t_r ' dereverberation and ' t_d ' denoising'])
+disp(['TCS-IITB>> Performing single-channel ' t_r ' dereverberation and ' t_d ' denoising'])
 
   if(strcmp(t_r,"wpe"))
              str=['./codes/dereverb/wpe1.py ' filename ' ' num2str(num_chn)];
@@ -122,14 +122,14 @@ if(denoise==0 && reverb==1)
 end
 
 if(denoise==0 && reverb==0)
-disp('Processing')
+disp('TCS-IITB>>  Processing')
 	for i=1:num_chn
           
 	  [y,fs]= audioread(['single_channel/' filename '.CH' num2str(i) '.wav']);
           audiowrite(['beamform/' argv(){1} '.CH' num2str(i) '.wav'],y,fs)
         end
 end
-disp('Starting Beamforming')
+disp('TCS-IITB>> Starting Beamforming')
 %% ----------------------------Array Definition---------------------------
 % TCS Array
 % xmic=[-.10 .10 -.10 0 .10]; % left to right axis
@@ -145,10 +145,10 @@ if(strcmp(enhan,'mvdr') && strcmp(mask,"nn")) % Perform MVDR beamforming
  y = [y;temp'];
  end
 audiowrite(['beamform/' filename '_mvdr_nn.wav'],y',fs);
-disp('Enhancing audio using MVDR NN mask ')
+disp('TCS-IITB>> Enhancing audio using MVDR NN mask ')
 cmd = ['python codes/beamform/nnmvdr.py  codes/beamform/model_nnmask/mdl_adam/estimator_0.3827.pkl beamform/' filename '_mvdr_nn.wav' ' --gev False' ' --dump out_beamform'];
 [~]=system(cmd);
-disp('Enhancement Done')
+disp('TCS-IITB>> Enhancement Done')
 end
 
 
@@ -160,10 +160,10 @@ if(strcmp(enhan,'gev') && strcmp(mask,"nn")) % Perform MVDR beamforming
  y = [y;temp'];
  end
 audiowrite(['beamform/' filename '_gev_nn.wav'],y',fs);
-disp('Enhancing audio using GEV NN mask ')
+disp('TCS-IITB>> Enhancing audio using GEV NN mask ')
 cmd = ['python codes/beamform/nnmvdr.py codes/beamform/model_nnmask/mdl_adam/estimator_0.3827.pkl beamform/' filename '_gev_nn.wav'  ' --dump out_beamform'];
 [~]=system(cmd);
-disp('Enhancement Done')
+disp('TCS-IITB>> Enhancement Done')
 end
 
 
@@ -222,12 +222,12 @@ end;
 % audiowrite('Degrade_Spk1_MA4_NO.wav',y,Fs);
 % 
 if(strcmp(enhan,'dsb')) % Perform DSB Beanforming
-disp('Enhancing audio using DSB')
+disp('TCS-IITB>> Enhancing audio using DSB')
   [Y1,~] = DSB(X,TDOA);
   y1=istft_multi(Y1(:,:,1),nsampl).';
   y1=y1/max(abs(y1));
   Write_File( y1, Fs, [out_dir '_dsb.wav'] );
-disp('Enhancement Done')
+disp('TCS-IITB>> Enhancement Done')
   %audiowrite([out_dir 'DSB.wav'],y1,Fs);
 end% DSB
 
@@ -239,23 +239,23 @@ end% DSB
 
 if(strcmp(enhan,'mvdr') && strcmp(mask,"ta")) % Perform MVDR beamforming 
    % initial few frames assumed to be silence	
-   disp('Enhancing audio using MVDR Time averaged mask')
+   disp('TCS-IITB>> Enhancing audio using MVDR Time averaged mask')
    Y3 = MVDR(X,TDOA.',10);
    y3=istft_multi(Y3(:,:,1),nsampl).';
    y3=y3/max(abs(y3));
    Write_File(y3, Fs, [out_dir '_mvdr_ta.wav']);
-disp('Enhancement Done')
+disp('TCS-IITB>> Enhancement Done')
 end
 
 
 if(strcmp(enhan,'gev') && strcmp(mask,"ta")) % Perform MVDR beamforming 
    % initial few frames assumed to be silence	
-   disp('Enhancing audio using GEV Time averaged mask')
+   disp('TCS-IITB>> Enhancing audio using GEV Time averaged mask')
    Y3 = GEV(X,TDOA.',10);
    y3=istft_multi(Y3(:,:,1),nsampl).';
    y3=y3/max(abs(y3));
    Write_File(y3, Fs, [out_dir '_gev_ta.wav']);
-disp('Enhancement Done')
+disp('TCS-IITB>> Enhancement Done')
 end
 
 
