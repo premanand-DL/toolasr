@@ -139,9 +139,10 @@ num_c=$(ls ${input_file}* | wc -l)
 sam_fre=$(sox --i -r ${input_file}.CH1.wav)  
 if [ "${sam_fre}" != "16000" ]; then
         echo "TCS-IITB>> Since the audio sampling frequency is higher then 16KHz, downsampling to 16KHz"
+	sam_path=$(echo ${input_file} | rev | cut -d '/' -f 1 | rev)
 	start=`date +%s`
 	for i in $(eval echo {1..$num_c});do
-	 sox single_channel/${input_file}.CH${i}.wav -c 1 -r 16000 single_channel/${input_file}.CH${i}.wav
+	 sox ${input_file}.CH${i}.wav -c 1 -r 16000 single_channel/${sam_path}.CH${i}.wav
 	done
 	end=`date +%s`
 	runtime=$((end-start))
