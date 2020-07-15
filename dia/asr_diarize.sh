@@ -71,7 +71,7 @@ fi
 end=`date +%s`
 runtime=$((end-start))
 echo
-echo "TCS-IITB>> Elapsed time is ${runtime} seconds for SAD feature extraction"
+echo "TCS-IITB>> Runtime for SAD feature extraction : $(echo "scale=2;$runtime/1000" | bc -l) sec"
 echo 
 echo '
 #######################################################################
@@ -106,7 +106,7 @@ fi
 end=`date +%s`
 runtime=$((end-start))
 echo
-echo "TCS-IITB>> Elapsed time is ${runtime} seconds for segmentation"
+echo "TCS-IITB>> Runtime for segmentation: $(echo "scale=2;$runtime/1000" | bc -l) sec"
 echo 
 echo '
 #######################################################################
@@ -159,7 +159,7 @@ fi
 end=`date +%s`
 runtime=$((end-start))
 echo
-echo "TCS-IITB>> Elapsed time is ${runtime} seconds for diarization feature extraction and clustering"
+echo "TCS-IITB>> Runtime for diarization feature extraction and clustering : $(echo "scale=2;$runtime/1000" | bc -l) sec"
 echo 
 fi
 
@@ -188,7 +188,7 @@ done
 end=`date +%s`
 runtime=$((end-start))
 echo
-echo "TCS-IITB>> Elapsed time is ${runtime} seconds for extracting MFCC for decoding"  
+echo "TCS-IITB>> Runtime for extracting MFCC for decoding: $(echo "scale=2;$runtime/1000" | bc -l) sec"  
 echo 
 fi
 
@@ -203,7 +203,7 @@ steps/online/nnet2/extract_ivectors_online.sh --cmd "$train_cmd" --nj "${nspk}" 
 end=`date +%s`
 runtime=$((end-start))
 echo
-echo "TCS-IITB>> Elapsed time is ${runtime} seconds for extracting ivectors"   
+echo "TCS-IITB>> Runtime for extracting i-vectors : $(echo "scale=2;$runtime/1000" | bc -l) sec"   
 echo 
 fi
 
@@ -224,7 +224,7 @@ steps/nnet3/decode.sh --acwt 1.0 --post-decode-acwt 10.0 \
 end=`date +%s`
 runtime=$((end-start))
 echo 
-echo "TCS-IITB>> Elapsed time is ${runtime} seconds for decoding"   
+echo "TCS-IITB>> Runtime for decoding : $(echo "scale=2;$runtime/1000" | bc -l) sec"   
 echo 
 fi
 
