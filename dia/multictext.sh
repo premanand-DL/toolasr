@@ -137,7 +137,7 @@ echo "TCS-IITB>> Total runtime : $(echo "scale=2;$runtime/1000" | bc -l) sec"
 exit 1
 fi
 
-num_c=$(ls ${input_file}* | wc -l)
+num_c=$(ls ${input_file}.CH* | wc -l)
 #Get Sampling rate and downsampke to 16KHz
 sam_fre=$(sox --i -r ${input_file}.CH1.wav)  
 if [ "${sam_fre}" != "16000" ]; then
