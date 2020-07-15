@@ -57,7 +57,7 @@ echo '
 TCS-IITB>> Perform feature extraction for SAD
 #######################################################################
 '
-start=`date +%s`
+start=`date +%s%3N`
 if [ $stage -le 2 ]; then
   # mfccdir should be some place with a largish disk where you
   # want to store MFCC features.
@@ -68,7 +68,7 @@ if [ $stage -le 2 ]; then
       data/$x exp/make_mfcc/$x $mfccdir
   done
 fi
-end=`date +%s`
+end=`date +%s%3N`
 runtime=$((end-start))
 echo
 echo "TCS-IITB>> Runtime for SAD feature extraction : $(echo "scale=2;$runtime/1000" | bc -l) sec"
@@ -78,7 +78,7 @@ echo '
 TCS-IITB>> Perform SAD on the recording for obtaining segments
 #######################################################################
 '
-start=`date +%s`
+start=`date +%s%3N`
 dir=exp/segmentation${affix}
 sad_work_dir=exp/sad${affix}_${nnet_type}/
 sad_nnet_dir=$dir/tdnn_${nnet_type}_sad_1a
@@ -103,7 +103,7 @@ if [ $stage -le 3 ]; then
  done
 fi
 
-end=`date +%s`
+end=`date +%s%3N`
 runtime=$((end-start))
 echo
 echo "TCS-IITB>> Runtime for segmentation: $(echo "scale=2;$runtime/1000" | bc -l) sec"
@@ -111,9 +111,9 @@ echo
 echo '
 #######################################################################
 TCS-IITB>> Perform diarization on the dev/eval data
-#######################################################################
+####################################################################### ${runtime} seconds to build the graph
 '
-start=`date +%s`
+start=`date +%s%3N`
 mkdir -p $output_dir
 if [ $stage -le 4 ]; then
 echo 'TCS-IITB>> Removing all earlier stored label and transcript files before starting diarization'
@@ -156,7 +156,7 @@ if [[ ("$diarize" == "tdoa") || ("$diarize" == "xtdoa") ]] && [ "$single_channel
 	
 fi
 
-end=`date +%s`
+end=`date +%s%3N`
 runtime=$((end-start))
 echo
 echo "TCS-IITB>> Runtime for diarization feature extraction and clustering : $(echo "scale=2;$runtime/1000" | bc -l) sec"
@@ -177,7 +177,7 @@ cp data/${test_sets}_${nnet_type}_seg/{segments,wav.scp,spk2utt,utt2spk} data/$t
 #model_dir=exp/chain_cleaned/tdnn_1d_sp
 #graph_dir=$dir/graph_tgsmall
 if [ $stage -le 5 ]; then
-start=`date +%s`
+start=`date +%s%3N`
 for datadir in ${test_dir}; do
     steps/make_mfcc.sh --nj $nj --mfcc-config conf/mfcc_hires_asr.conf \
       --cmd "$train_cmd" data/${datadir}
@@ -185,7 +185,7 @@ for datadir in ${test_dir}; do
     utils/fix_data_dir.sh data/${datadir}
 done
 
-end=`date +%s`
+end=`date +%s%3N`
 runtime=$((end-start))
 echo
 echo "TCS-IITB>> Runtime for extracting MFCC for decoding: $(echo "scale=2;$runtime/1000" | bc -l) sec"  
@@ -193,14 +193,14 @@ echo
 fi
 
 if [ $stage -le 6 ]; then
-start=`date +%s`
+start=`date +%s%3N`
 data=$test_dir
 nspk=1
 steps/online/nnet2/extract_ivectors_online.sh --cmd "$train_cmd" --nj "${nspk}" \
       data/${data} exp/nnet3_cleaned/extractor \
       exp/nnet3_cleaned/ivectors_${data}
       
-end=`date +%s`
+end=`date +%s%3N`
 runtime=$((end-start))
 echo
 echo "TCS-IITB>> Runtime for extracting i-vectors : $(echo "scale=2;$runtime/1000" | bc -l) sec"   
@@ -210,18 +210,18 @@ fi
 
 
 if [ $stage -le 8 ]; then
-start=`date +%s`
+start=`date +%s%3N`
 [ ! -f "${graph_dir}/HCLG.fst" ] && utils/mkgraph.sh --self-loop-scale 1.0 --remove-oov \
-  data/lang ${model_dir} $graph_dir && end=`date +%s` && runtime=$((end-start)) && echo "TCS-IITB>> It took ${runtime} seconds to build the graph"
+  data/lang ${model_dir} $graph_dir && end=`date +%s%N` && runtime=$((end-start)) && echo "TCS-IITB>>  Runtime to build graph :$(echo "scale=2;$runtime/1000" | bc -l) sec"
   
-start=`date +%s`  
+start=`date +%s%3N`  
 decode_set=$test_dir
 steps/nnet3/decode.sh --acwt 1.0 --post-decode-acwt 10.0 \
     --nj ${nj} --cmd "$decode_cmd" \
     --online-ivector-dir exp/nnet3_cleaned/ivectors_${decode_set} \
     $graph_dir data/${decode_set} ${model_dir}/decode_${decode_set}_tgsmall
     
-end=`date +%s`
+end=`date +%s%3N`
 runtime=$((end-start))
 echo 
 echo "TCS-IITB>> Runtime for decoding : $(echo "scale=2;$runtime/1000" | bc -l) sec"   
