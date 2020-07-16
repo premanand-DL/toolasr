@@ -71,8 +71,9 @@ if [ $stage -le 1 ]; then
 	fi
 	for lines in `ls $path/audio`; do
 	num_c=$(ls $path/audio/$lines/${lines}.CH* | wc -l)
-	cp $path/audio/$lines/${lines}.CH* single_channel/.
 	octave -q codes/enhancement.m $lines $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask $seq
+	sox out_beamform/${lines}_${beamform}.wav -c 1 -r 8000 out_beamform/${lines}_${beamform}_8k.wav #Downsampling for Aspire Decoding
+	rm out_beamform/${lines}_${beamform}.wav  # Removing 16KHZ audio
 	done 
 
 	end=`date +%s`
@@ -91,7 +92,7 @@ data_set=data/dev_eval
 mkdir -p $data_set
 sess=$(ls $path/audio)
 for lines in `ls $path/audio`; do
-echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}.wav >> wav.scp
+echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> wav.scp
 text=$(cat ${path}/audio/${lines}/script.txt | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
 echo ${lines}_${beamform} $text >> $data_set/text
 done
