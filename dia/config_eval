@@ -9,6 +9,9 @@ seq=dr  # The sequence in in which single channel enhancement is done. {dr: deno
 #If you want to run decoding on TCS data then  using exp/nnet3_chain/tdnn_1d_sp as acoustic model dir and #If you want to run decoding on TCS data then use 'exp/nnet3_chain/tdnn_1d_sp' as acosutic model dir and 'exp/nnet3_chain/tdnn_1d_sp/graph' as the graph dir
 do_diarization=false ##If you want to run diarization on TCS data (uses speaker labels while doing ASR decoding, although no significant improvement seen)
 diarize=xvector        ##If not specified 'xtdoa' is default. Values: {xvector, tdoa, xtdoa}. Default: xtdoa
+seq=dr  # The sequence in in which single channel enhancement is done. {dr: denoise and dereverberation and rd: dereverberation and denoising }                                                     
+#If you want to run decoding on TCS data then  using exp/nnet3_chain/tdnn_1d_sp as acoustic model dir and #If you want to run decoding on TCS data then use 'exp/nnet3_chain/tdnn_1d_sp' as acosutic model dir and 'exp/nnet3_chain/tdnn_1d_sp/graph' as the graph dir
+
 
 ##########Best performing configuration for ASR#####################
 
