@@ -41,13 +41,14 @@ end=`date +%s`
 runtime=$((end-start))
 echo "TCS-IITB>> Runtime for downsampling : $runtime sec"
 fi
+
+
+if [ $stage -le 1 ]; then
 echo '
 #######################################################################
 TCS-IITB>> Performing Enhancement
 #######################################################################
 '
-
-if [ $stage -le 1 ]; then
 	## Data Preparation for enhancement
 	rm -f out_beamform/*
 	start=`date +%s`
@@ -91,13 +92,12 @@ if [ $stage -le 1 ]; then
 	runtime=$((end-start))
 	echo "TCS-IITB>> Runtime for enhancement : $runtime sec"
 fi
- 
+
 echo '
 #######################################################################
 TCS-IITB>> Preparing Data for ASR
 #######################################################################
 '
-
 ## Data Preparation for decoding
 data_set=data/dev_eval
 mkdir -p $data_set
@@ -114,6 +114,7 @@ cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
 utils/fix_data_dir.sh $data_set
 
 if [ ($stage -le 2) && ("${build_graph}" == true) ]; then
+\
 	echo "TCS-IITB>> Preparing LM"
 	for lines in `ls $path/audio`; do
 	cat ${path}/audio/${lines}/script.txt | sed 's/Speaker [0-9]: //g' | sed 's/\. /\n/g' | sed 's/\.//g' >> corpus.txt
@@ -175,28 +176,22 @@ if [ ($stage -le 2) && ("${build_graph}" == true) ]; then
 	echo "TCS-IITB>> === Preparing graph done; Graph stored at "${graph_dir}
 
 fi
+
+if [[ ($stage -le 3) && ("$do_diarization" == true) ]];then
 echo '
 #######################################################################
 TCS-IITB>> Perform feature extraction for SAD
 #######################################################################
 '
-for input_file in `ls $path/audio`;do 
-	num_spk=$(cat $path/audio/${input_file}/script.txt | head -1 | sed 's/Number of Speakers: //g') 
-	echo ${input_file}_${beamform} $num_spk >> $data_set/reco2num_spk
-done
-
-if [[ ($stage -le 3) && ("$do_diarization" == true) ]];then
 start=`date +%s`
-if [ $stage -le 2 ]; then
-  # mfccdir should be some place with a largish disk where you
-  # want to store MFCC features.
-  mfccdir=mfcc
-  for x in ${test_sets}; do
-    steps/make_mfcc.sh --nj $nj --cmd "$train_cmd" \
-      --mfcc-config conf/mfcc_hires.conf \
-      data/$x exp/make_mfcc/$x $mfccdir
-  done
-fi
+# mfccdir should be some place with a largish disk where you
+# want to store MFCC features.
+mfccdir=mfcc
+for x in ${test_sets}; do
+steps/make_mfcc.sh --nj $nj --cmd "$train_cmd" \
+--mfcc-config conf/mfcc_hires.conf \
+data/$x exp/make_mfcc/$x $mfccdir
+done
 end=`date +%s%`
 runtime=$((end-start))
 echo
@@ -282,7 +277,7 @@ echo "TCS-IITB>> Using the speaker labels written to utt2spk to do diarization"
 end=`date +%s`
 runtime=$((end-start))
 echo
-echo "TCS-IITB>> Runtime for segmentation: $runtime sec"
+echo "TCS-IITB>> Runtime for feature extraction and clustering: $runtime sec"
 echo 
 
 fi
@@ -292,7 +287,6 @@ echo '
 TCS-IITB>> Running Decoding 
 #######################################################################
 '
-
 if [ $stage -le 4 ]; then
 	echo "TCS-IITB>> Computing MFCCs for decoding"
 	start=`date +%s%`
@@ -308,12 +302,13 @@ if [ $stage -le 4 ]; then
 	echo
 	echo "TCS-IITB>> Runtime for extracting MFCC for decoding: $runtime sec"  
 	echo 
-	echo "TCS-IITB>> Extracting i-vectors"
-	echo  
+
 fi
 
 
 if [ $stage -le 5 ]; then
+	echo "TCS-IITB>> Extracting i-vectors"
+	echo  
 	start=`date +%s`
 	data=$test_dir
 	nspk=1
@@ -327,8 +322,6 @@ if [ $stage -le 5 ]; then
 	echo "TCS-IITB>> Runtime for extracting i-vectors :$runtime sec"   
 	echo 
 fi
-
-
 
 
 if [ $stage -le 6 ]; then
