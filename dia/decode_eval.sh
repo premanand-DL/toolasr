@@ -106,7 +106,7 @@ data_set=data/dev_eval
 mkdir -p $data_set
 sess=$(ls $path/audio)
 for lines in `ls $path/audio`; do
-echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> wav.scp
+echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
 text=$(cat ${path}/audio/${lines}/script.txt | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
 echo ${lines}_${beamform} $text >> $data_set/text
 done
