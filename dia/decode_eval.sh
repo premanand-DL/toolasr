@@ -24,7 +24,7 @@ graph_dir="exp/chain_cleaned/tdnn_7b/graph"
 build_graph=true
 
 
-
+#If the downsampled audio already exists, then start with stage=1
 if [ $stage -le 0 ]; then
 echo '
 #######################################################################
@@ -37,13 +37,14 @@ for lines in `ls $path/audio`; do
 	for i in $(eval echo {1..$num_c});do
 	 sox $path/audio/${lines}/${lines}.CH${i}.wav -c 1 -r 16000 single_channel/${lines}.CH${i}.wav
         done
+	
 done
 end=`date +%s`
 runtime=$((end-start))
 echo "TCS-IITB>> Runtime for downsampling : $runtime sec"
 fi
 
-
+# If the enhancement is already done then start with stage=2
 if [ $stage -le 1 ]; then
 echo '
 #######################################################################
