@@ -3,22 +3,26 @@
 
 ## 1. First Download 'TCS_recordings' folder from "https://drive.google.com/drive/folders/11ai2tZ0Jwy_8d_17cjgwSVaxC9QophQt?usp=sharing"
 
-## 2. Have the Aspire model downloaded; Extract the data/local inside 'data' folder in kaldi and exp/chain,exp/nnet3 inside exp; Rename these folders as chain--> chain_cleaned_aspire 
-##    and nnet3-->neet3_aspire
-
 ## 2. Extract the downloaded zip file in any directory so that <your dir>/TCS_recordings is the TCS datset location.
+
 
 ## 3. Go the the kaldi directory where the 'decode_eval.sh' script is located.
 
-## 4. Set the parameter variables in 'config_eval' file. This configuration file is used by decode.sh script. Set the parameters here properly.
+## 4. If the Acoustic model is not downloaded, have the Aspire model AM downloaded; Extract the data/local inside 'data' folder in kaldi and exp/chain,exp/nnet3 inside exp; Rename these folders as chain--> chain_cleaned_aspire 
+##    and nnet3-->neet3_aspire
 
-## 5. Run the decode.sh script as ./decode.sh <your dir>/TCS_recordings.
+## 5. Set the parameter variables in 'config_eval' file. This configuration file is used by decode.sh script. Set the parameters here properly.
+
+## 6. Run the decode.sh script as ./decode.sh <your dir>/TCS_recordings.
+
+
+
 
 #Rquirements
 
-# Kaldi with SRILM installed
+# 1. Kaldi with SRILM installed
 
-# TCS dataset downloaded
+# 2. TCS dataset downloaded
 
 
 
