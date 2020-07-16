@@ -98,23 +98,9 @@ fi
 
 echo '
 #######################################################################
-TCS-IITB>> Preparing Data for ASR
+TCS-IITB>> Preparing LM
 #######################################################################
 '
-## Data Preparation for decoding
-data_set=data/dev_eval
-mkdir -p $data_set
-sess=$(ls $path/audio)
-for lines in `ls $path/audio`; do
-echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
-text=$(cat ${path}/audio/${lines}/script.txt | grep 'Speaker [0-9]' | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
-echo ${lines}_${beamform} $text >> $data_set/text
-done
-
-
-cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
-#utils/utt2spk_to_spk2utt.pl $data_set/utt2spk > $data_set/spk2utt
-utils/fix_data_dir.sh $data_set
 
 if [[ ($stage -le 2) && ("${build_graph}" == true) ]]; then
 
@@ -298,6 +284,21 @@ TCS-IITB>> Running Decoding
 #######################################################################
 '
 if [ $stage -le 4 ]; then
+## Data Preparation for decoding
+data_set=data/dev_eval
+mkdir -p $data_set
+for lines in `ls $path/audio`; do
+echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
+text=$(cat ${path}/audio/${lines}/script.txt | grep 'Speaker [0-9]' | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
+echo ${lines}_${beamform} $text >> $data_set/text
+done
+
+cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
+#utils/utt2spk_to_spk2utt.pl $data_set/utt2spk > $data_set/spk2utt
+utils/fix_data_dir.sh $data_set
+fi 
+
+if [ $stage -le 5 ]; then
 	echo "TCS-IITB>> Computing MFCCs for decoding"
 	start=`date +%s%`
 	for datadir in ${test_dir}; do
@@ -316,7 +317,7 @@ if [ $stage -le 4 ]; then
 fi
 
 
-if [ $stage -le 5 ]; then
+if [ $stage -le 6 ]; then
 	echo "TCS-IITB>> Extracting i-vectors"
 	echo  
 	start=`date +%s`
@@ -334,7 +335,7 @@ if [ $stage -le 5 ]; then
 fi
 
 
-if [ $stage -le 6 ]; then
+if [ $stage -le 7 ]; then
 	start=`date +%s` 
 	echo "TCS-IITB>> Decoding"
 	decode_set=$test_dir
