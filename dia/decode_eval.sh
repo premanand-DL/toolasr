@@ -18,7 +18,7 @@ rm -rf data
 start1=`date +%s` 
 
 # Setting put directories
-model_dir="exp/chain_cleaned/tdnn_7b"
+model_dir="exp/chain_cleaned_aspire/tdnn_7b"
 aspire_dict_directory="acoustic_aspire_model/data/local/dict"
 graph_dir="exp/chain_cleaned/tdnn_7b/graph"
 build_graph=true
