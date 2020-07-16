@@ -17,7 +17,7 @@
       1. wget http://kaldi-asr.org/models/1/0001_aspire_chain_model.tar.gz
       2. tar 0001_aspire_chain_model.tar.gz
       4. cp -r exp/{chain,nnet3} <your-kaldi>/egs/toolasr/dia/exp/.
-      5. mv exp/chain exp/chain_cleaned_aspire && mv exp/nnet3 exp/nnet3_aspire
+      5. mv exp/chain exp/chain_cleaned_aspire && mv exp/nnet3 exp/nnet3_cleaned_aspire
 
 ## 5. Set the parameter variables in 'config_eval' file. This configuration file is used by decode.sh script. Set the parameters here properly.
 
