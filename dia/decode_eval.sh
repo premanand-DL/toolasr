@@ -13,7 +13,7 @@ test_dir=dev_eval
 [ -f path.sh ] && . ./path.sh
 path=$1
 mkdir -p data.bak
-cp -r data/* data.bak/
+cp -rf data/* data.bak/
 rm -rf data
 start1=`date +%s` 
 
@@ -23,13 +23,14 @@ aspire_dict_directory="acoustic_aspire_model/data/local/dict"
 graph_dir="exp/chain_cleaned/tdnn_7b/graph"
 build_graph=true
 
+
+
+if [ $stage -le 0 ]; then
 echo '
 #######################################################################
 TCS-IITB>> Downsampling the audio
 #######################################################################
 '
-
-if [ $stage -le 0 ]; then
 start=`date +%s`
 for lines in `ls $path/audio`; do
 	num_c=$(ls $path/audio/$lines/${lines}.CH* | wc -l)
