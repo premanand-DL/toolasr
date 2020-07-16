@@ -77,6 +77,7 @@ TCS-IITB>> Performing Enhancement
 	   beamforming=$(echo $beamform | cut -d '_' -f 1)
 	else
 	   beamforming=$beamform
+	fi
 	if [ -z "$dereverb" ]; then 
 	    dereverb=n
 	fi
