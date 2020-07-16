@@ -21,7 +21,7 @@
 
 ## 5. Set the parameter variables in 'config_eval' file. This configuration file is used by decode.sh script. Set the parameters here properly.
 
-## 6. Run the decode.sh script as ./decode.sh <your dir>/TCS_recordings.
+## 6. Run the decode.sh script as ./decode_eval.sh <your dir>/TCS_recordings.
 
 
 
