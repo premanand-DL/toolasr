@@ -23,8 +23,7 @@ aspire_dict_directory="acoustic_aspire_model/data/local/dict"
 graph_dir="exp/chain_cleaned/tdnn_7b/graph"
 build_graph=true
 
-echo 
-'
+echo '
 #######################################################################
 TCS-IITB>> Downsampling the audio
 #######################################################################
@@ -39,12 +38,13 @@ done
 end=`date +%s`
 runtime=$((end-start))
 echo "TCS-IITB>> Runtime for downsampling : $runtime sec"
-echo 
-'
+
+echo '
 #######################################################################
 TCS-IITB>> Performing Enhancement
 #######################################################################
 '
+
 if [ $stage -le 1 ]; then
 	## Data Preparation for enhancement
 	rm -f out_beamform/*
@@ -81,12 +81,12 @@ if [ $stage -le 1 ]; then
 	echo "TCS-IITB>> Runtime for enhancement : $runtime sec"
 fi
  
-
 echo '
 #######################################################################
 TCS-IITB>> Preparing Data for ASR
 #######################################################################
 '
+
 ## Data Preparation for decoding
 data_set=data/dev_eval
 mkdir -p $data_set
@@ -164,7 +164,6 @@ if [ ($stage -le 2) && ("${build_graph}" == true) ]; then
 	echo "TCS-IITB>> === Preparing graph done; Graph stored at "${graph_dir}
 
 fi
-
 echo '
 #######################################################################
 TCS-IITB>> Perform feature extraction for SAD
