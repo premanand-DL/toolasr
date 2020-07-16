@@ -107,7 +107,7 @@ mkdir -p $data_set
 sess=$(ls $path/audio)
 for lines in `ls $path/audio`; do
 echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
-text=$(cat ${path}/audio/${lines}/script.txt | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
+text=$(cat ${path}/audio/${lines}/script.txt | grep 'Speaker [0-9]' | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
 echo ${lines}_${beamform} $text >> $data_set/text
 done
 
@@ -232,6 +232,11 @@ echo
 echo "TCS-IITB>> Runtime for segmentation: $runtime sec"
 echo
 
+for input_file in `ls $path/audio`;do 
+num_spk=$(cat $path/audio/${input_file}/script.txt | head -1 | sed 's/Number of Speakers: //g') 
+echo ${input_file}_beamform $num_spk >> ${data_set}/reco2num_spk
+done
+
 start=`date +%s`
 if [ $stage -le 4 ]; then
 echo 'Removing all earlier stored label and transcript files before starting diarization'
@@ -350,5 +355,5 @@ echo "------------WER on TCS-dataset enhanced using ${bemform} is------------"
 cat ${model_dir}/decode_${test_dir}/scoring/best_wer 
 echo "WER stored at ${model_dir}/decode_${test_dir}/scoring/best_wer"
 
-echo "TCS-IITB>> Total Runtime : $(echo "scale=2;$runtime"/60 | bc -l) minutes"  
+echo "TCS-IITB>> Total Runtime : $runtime minutes"  
 
