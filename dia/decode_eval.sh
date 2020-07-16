@@ -115,8 +115,8 @@ cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
 #utils/utt2spk_to_spk2utt.pl $data_set/utt2spk > $data_set/spk2utt
 utils/fix_data_dir.sh $data_set
 
-if [ ($stage -le 2) && ("${build_graph}" == true) ]; then
-\
+if [[ ($stage -le 2) && ("${build_graph}" == true) ]]; then
+
 	echo "TCS-IITB>> Preparing LM"
 	for lines in `ls $path/audio`; do
 	cat ${path}/audio/${lines}/script.txt | sed 's/Speaker [0-9]: //g' | sed 's/\. /\n/g' | sed 's/\.//g' >> corpus.txt
