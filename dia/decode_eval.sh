@@ -34,7 +34,7 @@ for lines in `ls $path/audio`; do
 	num_c=$(ls $path/audio/$lines/${lines}.CH* | wc -l)
 	for i in $(eval echo {1..$num_c});do
 	 sox $path/audio/${lines}/${lines}.CH${i}.wav -c 1 -r 16000 single_channel/${lines}.CH${i}.wav
-
+        done
 done
 end=`date +%s`
 runtime=$((end-start))
