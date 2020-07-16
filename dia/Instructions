@@ -7,7 +7,7 @@
 
 ## 3. Go the the kaldi directory where the 'decode_eval.sh' script is located.
 
-## 4. If the Graph is not downloaded, you can use a graph created at https://drive.google.com/drive/folders/17utymefPCrHk49HeMKwziXSW5nVfwPtC?usp=sharing OR 
+## 4. If the graph model is not downloaded, you can use a graph created at https://drive.google.com/drive/folders/17utymefPCrHk49HeMKwziXSW5nVfwPtC?usp=sharing OR 
       if you want to build the graph (AM compiled with LM) again Acoustic model is not downloaded, have the Aspire model AM downloaded; Extract the data/local inside 'data' folder in kaldi and exp/chain,exp/nnet3 inside exp; Rename these folders as chain--> chain_cleaned_aspire 
 ##    and nnet3-->neet3_aspire
 
