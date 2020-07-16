@@ -28,6 +28,8 @@ echo '
 TCS-IITB>> Downsampling the audio
 #######################################################################
 '
+
+if [ $stage -le 0 ]; then
 start=`date +%s`
 for lines in `ls $path/audio`; do
 	num_c=$(ls $path/audio/$lines/${lines}.CH* | wc -l)
@@ -38,7 +40,7 @@ done
 end=`date +%s`
 runtime=$((end-start))
 echo "TCS-IITB>> Runtime for downsampling : $runtime sec"
-
+fi
 echo '
 #######################################################################
 TCS-IITB>> Performing Enhancement
@@ -50,7 +52,6 @@ if [ $stage -le 1 ]; then
 	rm -f out_beamform/*
 	start=`date +%s`
 	mask=$(echo $beamform | cut -d '_' -f 2)
-	beamforming=$(echo $beamform | cut -d '_' -f 1)
 	reverb=1
 	noise=1
 	if [ -z "$dereverb" ] || [ -z "$denoise" ]; then
@@ -69,6 +70,16 @@ if [ $stage -le 1 ]; then
 		noise=0
 		fi
 	fi
+	if [ ! -z "$mask" ]; then
+	   beamforming=$(echo $beamform | cut -d '_' -f 1)
+	else
+	   beamforming=$beamform
+	if [ -z "$dereverb" ]; then 
+	    dereverb=n
+	fi
+	if [ -z "$denoise" ]; then
+	    denoise=n
+	fi 
 	for lines in `ls $path/audio`; do
 	num_c=$(ls $path/audio/$lines/${lines}.CH* | wc -l)
 	octave -q codes/enhancement.m $lines $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask $seq
