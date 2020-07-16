@@ -5,7 +5,6 @@
 
 ## 2. Extract the downloaded zip file in any directory so that <your dir>/TCS_recordings is the TCS datset location.
 
-
 ## 3. Go the the kaldi directory where the 'decode_eval.sh' script is located.
 
 ## 4. If the Acoustic model is not downloaded, have the Aspire model AM downloaded; Extract the data/local inside 'data' folder in kaldi and exp/chain,exp/nnet3 inside exp; Rename these folders as chain--> chain_cleaned_aspire 
