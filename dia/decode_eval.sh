@@ -356,5 +356,5 @@ echo "------------WER on TCS-dataset enhanced using ${bemform} is------------"
 cat ${model_dir}/decode_${test_dir}/scoring/best_wer 
 echo "WER stored at ${model_dir}/decode_${test_dir}/scoring/best_wer"
 
-echo "TCS-IITB>> Total Runtime : $runtime minutes"  
+echo "TCS-IITB>> Total Runtime : $runtime seconds"  
 
