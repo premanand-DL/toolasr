@@ -25,6 +25,8 @@
 
 ## 7. Run the decode.sh script as ./decode_eval.sh <your dir>/TCS_recordings.
 
+## 8. Use the paramter 'nj' to set the number of threads to be used for running the script
+
 
 
 
