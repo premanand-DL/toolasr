@@ -300,7 +300,7 @@ fi
 
 if [ $stage -le 5 ]; then
 	echo "TCS-IITB>> Computing MFCCs for decoding"
-	start=`date +%s%`
+	start=`date +%s`
 	for datadir in ${test_dir}; do
 	    steps/make_mfcc.sh --nj $nj --mfcc-config conf/mfcc_hires_asr.conf \
 	      --cmd "$train_cmd" data/${datadir}
@@ -308,7 +308,7 @@ if [ $stage -le 5 ]; then
 	    utils/fix_data_dir.sh data/${datadir}
 	done
 
-	end=`date +%s%`
+	end=`date +%s`
 	runtime=$((end-start))
 	echo
 	echo "TCS-IITB>> Runtime for extracting MFCC for decoding: $runtime sec"  
