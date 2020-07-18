@@ -105,6 +105,7 @@ TCS-IITB>> Preparing LM
 if [[ ($stage -le 2) && ("${build_graph}" == true) ]]; then
 
 	echo "TCS-IITB>> Preparing LM"
+	rm -rf corpus.txt
 	for lines in `ls $path/audio`; do
 	cat ${path}/audio/${lines}/script.txt | sed 's/Speaker [0-9]: //g' | sed 's/\. /\n/g' | sed 's/\.//g' >> corpus.txt
 	done
