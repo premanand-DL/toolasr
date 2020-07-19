@@ -294,23 +294,23 @@ TCS-IITB>> Running Decoding
 '
 if [ $stage -le 4 ]; then
 ## Data Preparation for decoding
-mkdir -p $data_set
+mkdir -p ${data_set}_asr
 
-if [ ! -f ${test_dir}/wav.scp ]; then
+
 for lines in `ls $path/audio`; do
-echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> ${data_set}/wav.scp
+echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> ${data_set}_asr/wav.scp
 done 
-cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
+cat ${data_set}_asr/wav.scp | awk -F ' ' '{print $1" "$1}' > ${data_set}_asr/utt2spk
 #utils/utt2spk_to_spk2utt.pl $data_set/utt2spk > $data_set/spk2utt
-utils/fix_data_dir.sh $data_set
-fi
+utils/fix_data_dir.sh ${data_set}_asr
+
 
 for lines in `ls $path/audio`; do
 text=$(cat ${path}/audio/${lines}/script.txt | grep 'Speaker [0-9]' | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
-echo ${lines}_${beamform} $text >> ${data_set}/text
+echo ${lines}_${beamform} $text >> ${data_set}_asr/text
 done
 fi 
-test_dir=dev_eval
+test_dir=dev_eval_asr
 if [ $stage -le 5 ]; then
 	echo "TCS-IITB>> Computing MFCCs for decoding"
 	start=`date +%s`
