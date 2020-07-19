@@ -7,7 +7,7 @@
 
 . ./config_eval
 . ./cmd.sh
-stage=0
+stage=1
 nj=2
 test_dir=dev_eval
 data_set=data/dev_eval
