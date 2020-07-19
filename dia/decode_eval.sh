@@ -10,6 +10,7 @@
 stage=0
 nj=2
 test_dir=dev_eval
+data_set=data/dev_eval
 [ -f path.sh ] && . ./path.sh
 path=$1
 mkdir -p data.bak
@@ -167,7 +168,7 @@ if [[ ($stage -le 2) && ("${build_graph}" == true) ]]; then
 
 fi
 
-if [[ ($stage -le 3) && ("$do_diarization" == true) ]];then
+if [[ ($stage -le 3) && ("$do_diarization" == true) ]]; then
 echo '
 #######################################################################
 TCS-IITB>> Perform feature extraction for SAD
@@ -192,26 +193,26 @@ start=`date +%s`
 dir=exp/segmentation${affix}
 sad_work_dir=exp/sad${affix}_${nnet_type}/
 sad_nnet_dir=$dir/tdnn_${nnet_type}_sad_1a
-if [ $stage -le 3 ]; then
-  for datadir in ${test_sets}; do
-    test_set=data/${datadir}
-    if [ ! -f ${test_set}/wav.scp ]; then
-      echo "$0: Not performing SAD on ${test_set}"
-      exit 0
-    fi
-    ## Perform segmentation
-    local/segmentation/detect_speech_activity.sh --nj $nj --stage $sad_stage \
-     $test_set $sad_nnet_dir mfcc $sad_work_dir \
-     data/${datadir} || exit 1
 
-    test_dir=data/${datadir}_${nnet_type}_seg
-    mkdir -p  $test_dir
-    mv data/${datadir}_seg/* ${test_dir}/.
-    steps/segmentation/convert_utt2spk_and_segments_to_rttm.py \
-      ${test_dir}/utt2spk ${test_dir}/segments ${test_dir}/rttm
-
- done
+for datadir in ${test_sets}; do
+test_set=data/${datadir}
+if [ ! -f ${test_set}/wav.scp ]; then
+echo "$0: Not performing SAD on ${test_set}"
+exit 0
 fi
+## Perform segmentation
+local/segmentation/detect_speech_activity.sh --nj $nj --stage $sad_stage \
+$test_set $sad_nnet_dir mfcc $sad_work_dir \
+data/${datadir} || exit 1
+
+test_dir=data/${datadir}_${nnet_type}_seg
+mkdir -p  $test_dir
+mv data/${datadir}_seg/* ${test_dir}/.
+steps/segmentation/convert_utt2spk_and_segments_to_rttm.py \
+${test_dir}/utt2spk ${test_dir}/segments ${test_dir}/rttm
+
+done
+
 
 end=`date +%s`
 runtime=$((end-start))
@@ -219,7 +220,7 @@ echo
 echo "TCS-IITB>> Runtime for segmentation: $runtime sec"
 echo
 
-for input_file in `ls $path/audio`;do 
+for input_file in `ls $path/audio`; do 
 num_spk=$(cat $path/audio/${input_file}/script.txt | head -1 | sed 's/Number of Speakers: //g') 
 echo ${input_file}_beamform $num_spk >> ${data_set}/reco2num_spk
 done
@@ -286,7 +287,6 @@ TCS-IITB>> Running Decoding
 '
 if [ $stage -le 4 ]; then
 ## Data Preparation for decoding
-data_set=data/dev_eval
 mkdir -p $data_set
 for lines in `ls $path/audio`; do
 echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
