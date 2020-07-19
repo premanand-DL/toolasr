@@ -178,7 +178,7 @@ start=`date +%s`
 # mfccdir should be some place with a largish disk where you
 # want to store MFCC features.
 mfccdir=mfcc
-for x in ${test_sets}; do
+for x in ${test_dir}; do
 steps/make_mfcc.sh --nj $nj --cmd "$train_cmd" \
 --mfcc-config conf/mfcc_hires.conf \
 data/$x exp/make_mfcc/$x $mfccdir
@@ -194,12 +194,13 @@ dir=exp/segmentation${affix}
 sad_work_dir=exp/sad${affix}_${nnet_type}/
 sad_nnet_dir=$dir/tdnn_${nnet_type}_sad_1a
 
-for datadir in ${test_sets}; do
+for datadir in ${test_dir}; do
 test_set=data/${datadir}
-if [ ! -f ${test_set}/wav.scp ]; then
-echo "$0: Not performing SAD on ${test_set}"
-exit 0
-fi
+
+for lines in `ls $path/audio`; do
+echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
+done
+
 ## Perform segmentation
 local/segmentation/detect_speech_activity.sh --nj $nj --stage $sad_stage \
 $test_set $sad_nnet_dir mfcc $sad_work_dir \
@@ -288,10 +289,16 @@ TCS-IITB>> Running Decoding
 if [ $stage -le 4 ]; then
 ## Data Preparation for decoding
 mkdir -p $data_set
+
+if [ ! -f ${test_dir}/wav.scp ]; then
 for lines in `ls $path/audio`; do
-echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
+echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> ${data_set}/wav.scp
+done 
+fi
+
+for lines in `ls $path/audio`; do
 text=$(cat ${path}/audio/${lines}/script.txt | grep 'Speaker [0-9]' | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
-echo ${lines}_${beamform} $text >> $data_set/text
+echo ${lines}_${beamform} $text >> ${data_set}/text
 done
 
 cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
