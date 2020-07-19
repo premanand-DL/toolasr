@@ -233,12 +233,11 @@ echo ${input_file}_beamform $num_spk >> ${data_set}/reco2num_spk
 done
 
 start=`date +%s`
-if [ $stage -le 4 ]; then
 echo 'Removing all earlier stored label and transcript files before starting diarization'
 if [ "$diarize" == "xvector" ]; then
 extract_xvectors_only=false
 echo '------Running x-vector feature diarization-------------'
-  for datadir in ${test_sets}; do
+  for datadir in ${test_dir}; do
     if $use_new_rttm_reference == "true"; then
       mode="$(cut -d'_' -f1 <<<"$datadir")"
       ref_rttm=./chime6_rttm/${mode}_rttm
@@ -285,7 +284,6 @@ echo
 
 fi
 
-fi
 
 echo '
 #######################################################################
