@@ -103,7 +103,7 @@ if $write_utt2dur; then
 else
   write_utt2dur_opt=
 fi
-
+sleep 500
 if [ -f $data/segments ]; then
   echo "$0 [info]: segments file exists: using that."
 
