@@ -89,7 +89,7 @@ TCS-IITB>> Performing Enhancement
 	num_c=$(ls $path/audio/$lines/${lines}.CH* | wc -l)
 	octave -q codes/enhancement.m $lines $localize $beamforming $noise $reverb $denoise $dereverb ${num_c} $mask $seq
 	sox out_beamform/${lines}_${beamform}.wav -c 1 -r 8000 out_beamform/${lines}_${beamform}_8k.wav #Downsampling for Aspire Decoding
-	rm out_beamform/${lines}_${beamform}.wav  # Removing 16KHZ audio
+	#rm out_beamform/${lines}_${beamform}.wav  # Removing 16KHZ audio
 	done 
 
 	end=`date +%s`
