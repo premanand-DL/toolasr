@@ -9,6 +9,7 @@
 . ./conf/sad.conf
 . ./cmd.sh
 stage=1
+sad_stage=0
 nj=2
 test_dir=dev_eval
 data_set=data/dev_eval
