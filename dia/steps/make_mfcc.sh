@@ -74,7 +74,7 @@ for f in $required; do
 done
 
 utils/validate_data_dir.sh --no-text --no-feats $data || exit 1;
-
+sleep 500
 if [ -f $data/spk2warp ]; then
   echo "$0 [info]: using VTLN warp factors from $data/spk2warp"
   vtln_opts="--vtln-map=ark:$data/spk2warp --utt2spk=ark:$data/utt2spk"
