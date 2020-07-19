@@ -310,7 +310,7 @@ text=$(cat ${path}/audio/${lines}/script.txt | grep 'Speaker [0-9]' | sed 's/Spe
 echo ${lines}_${beamform} $text >> ${data_set}/text
 done
 fi 
-
+test_dir=dev_eval
 if [ $stage -le 5 ]; then
 	echo "TCS-IITB>> Computing MFCCs for decoding"
 	start=`date +%s`
