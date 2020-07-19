@@ -174,6 +174,7 @@ echo '
 TCS-IITB>> Perform feature extraction for SAD
 #######################################################################
 '
+mkdir -p ${data_set}
 start=`date +%s`
 # mfccdir should be some place with a largish disk where you
 # want to store MFCC features.
