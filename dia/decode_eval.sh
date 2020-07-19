@@ -182,6 +182,9 @@ start=`date +%s`
 for lines in `ls $path/audio`; do
 echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
 done
+cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
+#utils/utt2spk_to_spk2utt.pl $data_set/utt2spk > $data_set/spk2utt
+utils/fix_data_dir.sh $data_set
 
 mfccdir=mfcc
 for x in ${test_dir}; do
@@ -295,16 +298,15 @@ if [ ! -f ${test_dir}/wav.scp ]; then
 for lines in `ls $path/audio`; do
 echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> ${data_set}/wav.scp
 done 
+cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
+#utils/utt2spk_to_spk2utt.pl $data_set/utt2spk > $data_set/spk2utt
+utils/fix_data_dir.sh $data_set
 fi
 
 for lines in `ls $path/audio`; do
 text=$(cat ${path}/audio/${lines}/script.txt | grep 'Speaker [0-9]' | sed 's/Speaker [0-9]: //g' | sed 's/\.\n /.\ /g' | sed 's/\.//g')
 echo ${lines}_${beamform} $text >> ${data_set}/text
 done
-
-cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
-#utils/utt2spk_to_spk2utt.pl $data_set/utt2spk > $data_set/spk2utt
-utils/fix_data_dir.sh $data_set
 fi 
 
 if [ $stage -le 5 ]; then
