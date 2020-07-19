@@ -192,7 +192,7 @@ steps/make_mfcc.sh --nj $nj --cmd "$train_cmd" \
 --mfcc-config conf/mfcc_hires.conf \
 data/$x exp/make_mfcc/$x $mfccdir
 done
-end=`date +%s%`
+end=`date +%s`
 runtime=$((end-start))
 echo
 echo "TCS-IITB>> Runtime for SAD feature extraction : $runtime sec"
