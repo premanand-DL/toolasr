@@ -177,6 +177,11 @@ TCS-IITB>> Perform feature extraction for SAD
 start=`date +%s`
 # mfccdir should be some place with a largish disk where you
 # want to store MFCC features.
+
+for lines in `ls $path/audio`; do
+echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
+done
+
 mfccdir=mfcc
 for x in ${test_dir}; do
 steps/make_mfcc.sh --nj $nj --cmd "$train_cmd" \
@@ -196,11 +201,6 @@ sad_nnet_dir=$dir/tdnn_${nnet_type}_sad_1a
 
 for datadir in ${test_dir}; do
 test_set=data/${datadir}
-
-for lines in `ls $path/audio`; do
-echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
-done
-
 ## Perform segmentation
 local/segmentation/detect_speech_activity.sh --nj $nj --stage $sad_stage \
 $test_set $sad_nnet_dir mfcc $sad_work_dir \
