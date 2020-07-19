@@ -180,7 +180,7 @@ start=`date +%s`
 # want to store MFCC features.
 
 for lines in `ls $path/audio`; do
-echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}_8k.wav >> $data_set/wav.scp
+echo ${lines}_${beamform} ${PWD}/out_beamform/${lines}_${beamform}.wav >> $data_set/wav.scp
 done
 cat $data_set/wav.scp | awk -F ' ' '{print $1" "$1}' > $data_set/utt2spk
 #utils/utt2spk_to_spk2utt.pl $data_set/utt2spk > $data_set/spk2utt
