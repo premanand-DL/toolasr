@@ -6,6 +6,7 @@
 #From IIT Bombay, Mumbai
 
 . ./config_eval
+. ./conf/sad.conf
 . ./cmd.sh
 stage=1
 nj=2
