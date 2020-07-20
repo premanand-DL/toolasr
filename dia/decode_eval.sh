@@ -121,7 +121,7 @@ if [[ ($stage -le 2) && ("${build_graph}" == true) ]]; then
 	cp $aspire_dict_directory/silence_phones.txt $dict_dir
 	cp $aspire_dict_directory/optional_silence.txt $dict_dir
 	cp $aspire_dict_directory/nonsilence_phones.txt $dict_dir
-	cp $aspire_dict_directory/lexicon_new $dict_dir/lexicon.txt
+	cp $aspire_dict_directory/lexicon3_new $dict_dir/lexicon.txt
 
 	sed -i '1s/^/!SIL sil\n/' $dict_dir/lexicon.txt # Add !SIL to lexicon
 
